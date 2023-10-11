@@ -28,14 +28,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// mvCmd represents the mv command
-var mvCmd = &cobra.Command{
-	Use: "mv",
+// rmCmd represents the rm command
+var rmCmd = &cobra.Command{
+	Use: "rm",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("mv called")
+		fmt.Println("rm called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(mvCmd)
+	rootCmd.AddCommand(rmCmd)
 }

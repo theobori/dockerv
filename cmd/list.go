@@ -30,7 +30,7 @@ import (
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
-	Use:   "list",
+	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("list called")
 	},

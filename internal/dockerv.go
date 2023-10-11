@@ -20,22 +20,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package cmd
+package dockerv
 
-import (
-	"fmt"
+import "github.com/docker/docker/client"
 
-	"github.com/spf13/cobra"
+type ActionKind int
+
+const (
+	Import ActionKind = 0
+	Export ActionKind = 1
+	Copy   ActionKind = 2
+	Move   ActionKind = 3
 )
 
-// mvCmd represents the mv command
-var mvCmd = &cobra.Command{
-	Use: "mv",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("mv called")
-	},
+type DockerVConfig struct {
+	Kind             ActionKind
+	PointSource      Point
+	PointDestination Point
+	Recursive        bool
 }
 
-func init() {
-	rootCmd.AddCommand(mvCmd)
+type DockerV struct {
+	config DockerVConfig
+	cli    *client.Client
+}
+
+func NewDockerV(config *DockerVConfig) (*DockerV, error) {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &DockerV{
+		*config,
+		cli,
+	}, nil
+}
+
+func NewDefaultDockerV() (*DockerV, error) {
+	return NewDockerV(
+		&DockerVConfig{
+			Kind: Export,
+		},
+	)
+}
+
+func (dv *DockerV) SetConfig(config *DockerVConfig) {
+	dv.config = *config
+}
+
+func (dv *DockerV) Config() DockerVConfig {
+	return dv.config
 }

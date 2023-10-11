@@ -31,8 +31,8 @@ import (
 )
 
 var (
-	dv       = dockerv.NewDefaultDockerVolume()
-	dvConfig = &dockerv.DockerVolumeConfig{}
+	dv, _    = dockerv.NewDefaultDockerV()
+	dvConfig = &dockerv.DockerVConfig{}
 
 	rootCmd = &cobra.Command{
 		Use:   "dockerv",
@@ -41,25 +41,51 @@ var (
 move and copy your Docker volumes.
 
 It also supports docker compose
-files and has recursive features.`,
+files and has recursive features.
+
+A point can be:
+	- A tarball
+	- A Docker volume
+	- A Docker compose file
+	- A directory
+`,
 	}
 )
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+	if err := rootCmd.Execute(); err != nil || dv == nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-
-	dv.SetConfig(dvConfig)
 }
 
 func init() {
-	// rootCmd.PersistentFlags().BoolVarP(
-	// 	&dvConfig.Recursive,
-	// 	"recursive",
-	// 	"R",
-	// 	false,
-	// 	"Taking in count the sub directories",
-	// )
+	dockerv.InitPointKindFuncs()
+
+	rootCmd.PersistentFlags().BoolVarP(
+		&dvConfig.Recursive,
+		"recursive",
+		"r",
+		false,
+		"Taking in count the sub directories",
+	)
+
+	pointSrcValue := rootCmd.PersistentFlags().String(
+		"src",
+		".",
+		"The source point",
+	)
+	rootCmd.MarkPersistentFlagRequired("src")
+
+	pointDestValue := rootCmd.PersistentFlags().String(
+		"dest",
+		".",
+		"The destination point",
+	)
+	rootCmd.MarkPersistentFlagRequired("dest")
+
+	dvConfig.PointSource = dockerv.NewPoint(*pointSrcValue)
+	dvConfig.PointDestination = dockerv.NewPoint(*pointDestValue)
+
+	dv.SetConfig(dvConfig)
 }

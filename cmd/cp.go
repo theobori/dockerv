@@ -30,7 +30,7 @@ import (
 
 // cpCmd represents the cp command
 var cpCmd = &cobra.Command{
-	Use:   "cp",
+	Use: "cp",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("cp called")
 	},

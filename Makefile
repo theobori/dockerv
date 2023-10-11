@@ -15,4 +15,4 @@ test: clean
 .PHONY: \
 	fmt \
 	test \
-	clean \
+	clean

@@ -26,13 +26,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
-	"github.com/theobori/dockerv/internal"
+	dockerv "github.com/theobori/dockerv/internal"
 )
 
 var (
 	dv, _    = dockerv.NewDefaultDockerV()
-	dvConfig = &dockerv.DockerVConfig{}
+	dvConfig = dockerv.DockerVConfig{}
+
+	cli *client.Client
 
 	rootCmd = &cobra.Command{
 		Use:   "dockerv",
@@ -49,8 +52,22 @@ A point can be:
 	- A Docker compose file
 	- A directory
 `,
+		Run: func(cmd *cobra.Command, args []string) {
+			dv.SetConfig(&dvConfig)
+		},
 	}
 )
+
+func initPoint(cmd *cobra.Command, pointDest *dockerv.Point, argName string) {
+	pointSrcValue, _ := cmd.Flags().GetString(argName)
+
+	point := dockerv.NewPoint(pointSrcValue)
+	point.SetClient(cli)
+
+	*pointDest = point
+
+	dv.SetConfig(&dvConfig)
+}
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil || dv == nil {
@@ -60,32 +77,25 @@ func Execute() {
 }
 
 func init() {
-	dockerv.InitPointKindFuncs()
-
-	rootCmd.PersistentFlags().BoolVarP(
-		&dvConfig.Recursive,
-		"recursive",
-		"r",
-		false,
-		"Taking in count the sub directories",
-	)
-
-	pointSrcValue := rootCmd.PersistentFlags().String(
+	rootCmd.PersistentFlags().String(
 		"src",
 		".",
 		"The source point",
 	)
 	rootCmd.MarkPersistentFlagRequired("src")
 
-	pointDestValue := rootCmd.PersistentFlags().String(
-		"dest",
-		".",
-		"The destination point",
-	)
-	rootCmd.MarkPersistentFlagRequired("dest")
+	// DockerV setup
+	dockerv.InitPointKindFuncs()
 
-	dvConfig.PointSource = dockerv.NewPoint(*pointSrcValue)
-	dvConfig.PointDestination = dockerv.NewPoint(*pointDestValue)
+	var err error
 
-	dv.SetConfig(dvConfig)
+	// Setup the Docker Client
+	cli, err = client.NewClientWithOpts(client.FromEnv)
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	dv.SetDockerClient(cli)
 }

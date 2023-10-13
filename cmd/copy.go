@@ -26,16 +26,31 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	dockerv "github.com/theobori/dockerv/internal"
 )
 
-// mvCmd represents the mv command
-var mvCmd = &cobra.Command{
-	Use: "mv",
+// copyCmd represents the copy command
+var copyCmd = &cobra.Command{
+	Use: "copy",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("mv called")
+		fmt.Println("copy called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(mvCmd)
+	pointDestValue := copyCmd.PersistentFlags().String(
+		"dest",
+		".",
+		"The destination point",
+	)
+	copyCmd.MarkPersistentFlagRequired("dest")
+
+	rootCmd.AddCommand(copyCmd)
+
+	PointDestination := dockerv.NewPoint(*pointDestValue)
+	PointDestination.SetClient(cli)
+
+	dvConfig.PointDestination = PointDestination
+
+	dv.SetConfig(&dvConfig)
 }

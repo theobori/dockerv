@@ -25,20 +25,18 @@ package dockerv
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/docker/docker/client"
 )
 
 type PointKind int
 type PointPathKind int
+type Volumes []string
 
 const (
 	Path         PointKind = 0
 	DockerVolume PointKind = 1
-	Unknown      PointKind = 1
+	Unknown      PointKind = 2
 
 	DockerCompose PointPathKind = 0
 	Directory     PointPathKind = 1
@@ -46,42 +44,22 @@ const (
 	UnknownPath   PointPathKind = 3
 )
 
-type PointPathKindFunc *func(*os.File) (bool, error)
+type PointPathKindFunc *func(string) (bool, error)
 type PointPathKindFuncs map[PointPathKindFunc]PointPathKind
 
 var pointPathKindFuncs = make(PointPathKindFuncs)
+
+func InitPointKindFuncs() {
+	pointPathKindFuncs[&isDirectory] = Directory
+	pointPathKindFuncs[&isYAML] = DockerCompose
+	pointPathKindFuncs[&isTarball] = Tarball
+}
 
 type Point struct {
 	value string
 	kind  *PointKind
 
 	cli *client.Client
-}
-
-var isDirectory = func (file *os.File) (bool, error) {
-	fileInfo, err := file.Stat()
-
-	if err != nil {
-		return false, err
-	}
-
-	return fileInfo.IsDir(), nil
-}
-
-var isDockerCompose = func (file *os.File) (bool, error) {
-	// TODO: use compose-go lib to parse as YAML file
-	return true, nil
-}
-
-// Just checking file ext
-var isTarball = func (file *os.File) (bool, error) {
-	return strings.HasSuffix(file.Name(), ".tar.gz"), nil
-}
-
-func InitPointKindFuncs() {
-	pointPathKindFuncs[&isDirectory] = Directory
-	pointPathKindFuncs[&isDockerCompose] = Directory
-	pointPathKindFuncs[&isTarball] = Directory
 }
 
 func NewPoint(value string) Point {
@@ -92,7 +70,7 @@ func NewPoint(value string) Point {
 	}
 }
 
-func (p *Point) WithClient(cli *client.Client) *Point {
+func (p *Point) SetClient(cli *client.Client) *Point {
 	p.cli = cli
 
 	return p
@@ -102,26 +80,12 @@ func (p *Point) Value() string {
 	return p.value
 }
 
-func (p *Point) Equal(pDest *Point) bool {
-	kind := p.Kind()
-
-	if kind != pDest.Kind() {
-		return false
-	}
-
-	if kind == DockerVolume {
-		return p.Value() == pDest.Value()
-	}
-
-	return filepath.Clean(p.Value()) == filepath.Clean(pDest.Value())
-}
-
 func (p *Point) guessKind() (PointKind, error) {
 	if p.cli == nil {
 		return Unknown, fmt.Errorf("missing the Docker client instance")
 	}
 
-	if IsDockerVolume(context.Background(), p.cli, p.value) {
+	if DockerVolumeExists(context.Background(), p.cli, p.value) {
 		return DockerVolume, nil
 	}
 
@@ -130,18 +94,8 @@ func (p *Point) guessKind() (PointKind, error) {
 }
 
 func (p *Point) PathKind() (PointPathKind, error) {
-	var err error
-
-	file, err := os.Open(p.value)
-
-	if err != nil {
-		return UnknownPath, err
-	}
-
-	defer file.Close()
-
 	for f, pathKind := range pointPathKindFuncs {
-		is, err := (*f)(file)
+		is, err := (*f)(p.value)
 
 		if is && err == nil {
 			return pathKind, nil
@@ -162,7 +116,55 @@ func (p *Point) Kind() PointKind {
 		fmt.Println(err)
 	}
 
-	*p.kind = kind
+	p.kind = &kind
 
 	return *p.kind
+}
+
+func (p *Point) volumesFromPath() Volumes {
+	pathKind, err := p.PathKind()
+
+	if err != nil {
+		return Volumes{}
+	}
+
+	switch pathKind {
+	case DockerCompose:
+		v, err := volumesFromDockerCompose(p.value)
+
+		if err != nil {
+			return Volumes{}
+		}
+
+		return v
+	case Directory:
+		v, err := volumesFromDirectory(p.value)
+
+		if err != nil {
+			return Volumes{}
+		}
+
+		return v
+
+	case Tarball:
+		fmt.Println("Tarball")
+	}
+
+	return Volumes{}
+}
+
+func (p *Point) Volumes() Volumes {
+	if p.cli == nil {
+		return Volumes{}
+	}
+
+	if p.Kind() == DockerVolume {
+		return Volumes{p.value}
+	}
+
+	if p.Kind() == Path {
+		return p.volumesFromPath()
+	}
+
+	return Volumes{}
 }

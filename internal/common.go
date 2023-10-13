@@ -20,32 +20,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package cmd
+package dockerv
 
-import (
-	"fmt"
-	"os"
+func mapKeys(m map[string]any) []string {
+	keys := make([]string, len(m))
+	i := 0
 
-	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal"
-)
+	for k := range m {
+		keys[i] = k
+		i++
+	}
 
-// listCmd represents the list command
-var listCmd = &cobra.Command{
-	Use: "list",
-	Run: func(cmd *cobra.Command, args []string) {
-		initPoint(cmd, &dvConfig.PointSource, "src")
-
-		if err := dv.Execute(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-	},
-}
-
-func init() {
-	dvConfig.Kind = dockerv.List
-
-	dv.SetConfig(&dvConfig)
-
-	rootCmd.AddCommand(listCmd)
+	return keys
 }

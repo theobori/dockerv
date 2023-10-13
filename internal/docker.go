@@ -28,10 +28,11 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func IsDockerVolume(ctx context.Context, cli *client.Client, name string) bool {
-	if _, err := cli.VolumeInspect(ctx, name); err != nil {
-		return false
-	}
+// Without ext
+const DockerComposeFilename = "docker-compose"
 
-	return true
+func DockerVolumeExists(ctx context.Context, cli *client.Client, name string) bool {
+	_, err := cli.VolumeInspect(ctx, name)
+
+	return err == nil
 }

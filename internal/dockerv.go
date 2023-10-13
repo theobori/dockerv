@@ -22,7 +22,11 @@ THE SOFTWARE.
 
 package dockerv
 
-import "github.com/docker/docker/client"
+import (
+	"fmt"
+
+	"github.com/docker/docker/client"
+)
 
 type ActionKind int
 
@@ -31,31 +35,42 @@ const (
 	Export ActionKind = 1
 	Copy   ActionKind = 2
 	Move   ActionKind = 3
+	List   ActionKind = 4
+	Remove ActionKind = 5
 )
 
 type DockerVConfig struct {
 	Kind             ActionKind
 	PointSource      Point
 	PointDestination Point
-	Recursive        bool
 }
+
+type Executes map[ActionKind]func() error
 
 type DockerV struct {
 	config DockerVConfig
 	cli    *client.Client
+
+	executes Executes
 }
 
 func NewDockerV(config *DockerVConfig) (*DockerV, error) {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	executes := make(Executes)
 
-	if err != nil {
-		return nil, err
+	dv := DockerV{
+		*config,
+		nil,
+		executes,
 	}
 
-	return &DockerV{
-		*config,
-		cli,
-	}, nil
+	dv.executes[Import] = dv._import
+	dv.executes[Export] = dv.export
+	dv.executes[Copy] = dv.copy
+	dv.executes[Move] = dv.move
+	dv.executes[List] = dv.list
+	dv.executes[Remove] = dv.remove
+
+	return &dv, nil
 }
 
 func NewDefaultDockerV() (*DockerV, error) {
@@ -66,10 +81,46 @@ func NewDefaultDockerV() (*DockerV, error) {
 	)
 }
 
+func (dv *DockerV) SetDockerClient(cli *client.Client) {
+	dv.cli = cli
+}
+
 func (dv *DockerV) SetConfig(config *DockerVConfig) {
 	dv.config = *config
 }
 
 func (dv *DockerV) Config() DockerVConfig {
 	return dv.config
+}
+
+func (dv *DockerV) _import() error {
+	return nil
+}
+
+func (dv *DockerV) export() error {
+	return nil
+}
+
+func (dv *DockerV) list() error {
+	for _, volume := range dv.config.PointSource.Volumes() {
+		fmt.Println(volume)
+	}
+
+	return nil
+}
+
+func (dv *DockerV) move() error {
+	return nil
+}
+
+func (dv *DockerV) copy() error {
+	return nil
+}
+
+func (dv *DockerV) remove() error {
+	return nil
+}
+
+func (dv *DockerV) Execute() error {
+	return dv.executes[dv.config.Kind]()
 }

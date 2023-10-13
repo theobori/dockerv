@@ -1,14 +1,14 @@
 /*
 Copyright © 2023 Théo Bori <nagi@tilde.team>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
+Peremoveission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
+copies of the Software, and to peremoveit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
+The above copyright notice and this peremoveission notice shall be included in
 all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -28,14 +28,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rmCmd represents the rm command
-var rmCmd = &cobra.Command{
-	Use: "rm",
+// removeCmd represents the remove command
+var removeCmd = &cobra.Command{
+	Use: "remove",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("rm called")
+		fmt.Println("remove called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(rmCmd)
+	rootCmd.AddCommand(removeCmd)
 }

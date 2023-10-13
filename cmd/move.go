@@ -28,14 +28,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// cpCmd represents the cp command
-var cpCmd = &cobra.Command{
-	Use: "cp",
+// moveCmd represents the move command
+var moveCmd = &cobra.Command{
+	Use: "move",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("cp called")
+		fmt.Println("move called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(cpCmd)
+	rootCmd.AddCommand(moveCmd)
 }

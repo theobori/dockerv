@@ -51,7 +51,7 @@ func init() {
 		"force",
 		"f",
 		false,
-		"Ignore the volumes that does not exist",
+		"Ignore the Docker volumes that does not exist",
 	)
 
 	rootCmd.AddCommand(removeCmd)

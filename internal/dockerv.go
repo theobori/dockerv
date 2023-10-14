@@ -47,6 +47,7 @@ type DockerVConfig struct {
 	PointSource      string
 	PointDestination *string
 	Force            bool
+	State bool
 }
 
 type ExecutesValueField struct {
@@ -119,6 +120,8 @@ func (dv *DockerV) export() error {
 }
 
 func (dv *DockerV) list() error {
+	var existsMsg string
+	
 	volumes, err := (*dv.source).Volumes()
 
 	if err != nil {
@@ -126,7 +129,24 @@ func (dv *DockerV) list() error {
 	}
 
 	for _, volume := range volumes {
-		fmt.Println(volume)
+		exists := docker.DockerVolumeExists(
+			context.Background(),
+			dv.cli,
+			volume,
+		)
+
+		if !dv.config.State {
+			fmt.Println(volume)
+			continue
+		}
+
+		if exists {
+			existsMsg = "[exists]"
+		} else {
+			existsMsg = "[No such volume]"
+		}
+
+		fmt.Println(existsMsg, volume)
 	}
 
 	return nil

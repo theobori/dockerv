@@ -35,6 +35,7 @@ var listCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
 		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
+		dvConfig.State, _ = cmd.Flags().GetBool("state")
 
 		dvConfig.Kind = dockerv.List
 
@@ -46,5 +47,11 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
+	listCmd.PersistentFlags().Bool(
+		"state",
+		false,
+		"Show if the Docker volume exists",
+	)
+
 	rootCmd.AddCommand(listCmd)
 }

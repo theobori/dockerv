@@ -26,12 +26,22 @@ func Init() {
 }
 
 func PointFromMetadata(cli *client.Client, metadata *PointMetadata) *Point {
-	for k, v := range pointResolver {
-		if metadata.Kind(cli) == k {
-			p := (*v)(cli, metadata.Value())
+	var value string
 
-			return &p
+	for k, v := range pointResolver {
+		if metadata.Kind(cli) != k {
+			continue
 		}
+
+		if k == DockerVolume {
+			value = metadata.Value()
+		} else {
+			value = metadata.AbsValue()
+		}
+
+		p := (*v)(cli, value)
+
+		return &p
 	}
 
 	return nil

@@ -72,7 +72,7 @@ func ParseYAML(path string) (map[string]any, error) {
 	return yamlData, nil
 }
 
-var IsYAML = func(path string) (bool, error) {
+var isYAML = func(path string) (bool, error) {
 	_, err := ParseYAML(path)
 
 	if err != nil {
@@ -83,16 +83,20 @@ var IsYAML = func(path string) (bool, error) {
 }
 
 var IsDockerCompose = func(path string) (bool, error) {
-	isYaml, err := IsYAML(path)
+	isYaml, err := isYAML(path)
 
 	if err != nil {
 		return false, err
 	}
 
-	name := strings.Split(filepath.Base(path), ".")[0]
+	nameFull := strings.Split(filepath.Base(path), ".")
+	name := nameFull[0]
+	ext := nameFull[len(nameFull) - 1]
 
 	return name == docker.DockerComposeFilename &&
-		isYaml, nil
+		isYaml &&
+		(ext == "yml" || ext == "yaml"),
+		nil
 }
 
 var IsTarball = func(path string) (bool, error) {

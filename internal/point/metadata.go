@@ -25,7 +25,7 @@ package point
 import (
 	"context"
 	"fmt"
-	"os"
+	"path/filepath"
 
 	"github.com/docker/docker/client"
 	"github.com/theobori/dockerv/internal/docker"
@@ -50,7 +50,7 @@ var pointKindFuncs = make(PointKindFuncs)
 
 func InitPointKindFuncs() {
 	pointKindFuncs[&file.IsDirectory] = Directory
-	pointKindFuncs[&file.IsYAML] = DockerCompose
+	pointKindFuncs[&file.IsDockerCompose] = DockerCompose
 	pointKindFuncs[&file.IsTarball] = Tarball
 }
 
@@ -68,6 +68,16 @@ func NewPointMetadata(value string) PointMetadata {
 
 func (p *PointMetadata) Value() string {
 	return p.value
+}
+
+func (p *PointMetadata) AbsValue() string {
+	abs, err := filepath.Abs(p.value)
+
+	if err != nil {
+		return p.value
+	}
+
+	return abs
 }
 
 func (p *PointMetadata) pathKind() (PointKind, error) {
@@ -95,11 +105,7 @@ func (p *PointMetadata) Kind(cli *client.Client) PointKind {
 		return *p.kind
 	}
 
-	kind, err := p.guessKind(cli)
-
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
+	kind, _ := p.guessKind(cli)
 
 	p.kind = &kind
 

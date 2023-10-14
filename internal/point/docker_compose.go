@@ -2,6 +2,7 @@ package point
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/docker/docker/client"
 	"github.com/theobori/dockerv/common"
@@ -24,8 +25,20 @@ func (dc *DockerComposePoint) Kind() PointKind {
 	return DockerCompose
 }
 
-func (dv *DockerComposePoint) resolveVolumeNames(volumes []string) []string {
-	return []string{}
+func (dc *DockerComposePoint) resolveVolumeNames(volumes []string) []string {
+	splittedPath := strings.Split(dc.value, "/")
+
+	if len(splittedPath) < 2 {
+		return volumes
+	}
+
+	volumePrefix := splittedPath[len(splittedPath) - 2] + "_"
+
+	for i, volume := range volumes {
+		volumes[i] = volumePrefix + volume
+	}
+
+	return volumes
 }
 
 func (dc *DockerComposePoint) Volumes() ([]string, error) {
@@ -35,13 +48,15 @@ func (dc *DockerComposePoint) Volumes() ([]string, error) {
 		return []string{}, err
 	}
 
-	volumes, ok := yamlData["volumes"].(map[string]any)
+	volumesField, ok := yamlData["volumes"].(map[string]any)
 
 	if !ok {
 		return []string{}, fmt.Errorf("missing the volumes field")
 	}
 
-	return common.MapKeys(volumes), nil
+	volumesKeys := common.MapKeys(volumesField)
+
+	return dc.resolveVolumeNames(volumesKeys), nil
 }
 
 func (dc *DockerComposePoint) Import([]string) error {

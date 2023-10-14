@@ -64,8 +64,6 @@ type DockerV struct {
 }
 
 func NewDockerV(cli *client.Client, config *DockerVConfig) (*DockerV, error) {
-	executes := make(Executes)
-
 	var pointDestination *point.Point
 
 	if config.PointDestination != nil {
@@ -80,7 +78,7 @@ func NewDockerV(cli *client.Client, config *DockerVConfig) (*DockerV, error) {
 		cli,
 		point.PointFromValue(cli, config.PointSource),
 		pointDestination,
-		executes,
+		make(Executes),
 	}
 
 	dv.executes[Import] = ExecutesValueField{true, dv._import}

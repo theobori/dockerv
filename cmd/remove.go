@@ -24,18 +24,35 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	dockerv "github.com/theobori/dockerv/internal"
 )
 
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
 	Use: "remove",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("remove called")
+		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
+		dvConfig.Force, _ = cmd.Flags().GetBool("force")
+
+		dvConfig.Kind = dockerv.Remove
+
+		if err := dockerVExecute(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 	},
 }
 
 func init() {
+	removeCmd.PersistentFlags().BoolP(
+		"force",
+		"f",
+		false,
+		"Ignore the volumes that does not exist",
+	)
+
 	rootCmd.AddCommand(removeCmd)
 }

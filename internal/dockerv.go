@@ -23,14 +23,15 @@ THE SOFTWARE.
 package dockerv
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/docker/docker/client"
+	"github.com/theobori/dockerv/internal/docker"
 	"github.com/theobori/dockerv/internal/point"
 )
 
 type ActionKind int
-type Volumes []string
 
 const (
 	Import ActionKind = 0
@@ -45,6 +46,7 @@ type DockerVConfig struct {
 	Kind             ActionKind
 	PointSource      string
 	PointDestination *string
+	Force            bool
 }
 
 type ExecutesValueField struct {
@@ -139,6 +141,34 @@ func (dv *DockerV) copy() error {
 }
 
 func (dv *DockerV) remove() error {
+	volumes, err := (*dv.source).Volumes()
+
+	if err != nil {
+		return err
+	}
+
+	for _, volume := range volumes {
+		exists := docker.DockerVolumeExists(
+			context.Background(),
+			dv.cli,
+			volume,
+		)
+
+		err := dv.cli.VolumeRemove(
+			context.Background(),
+			volume,
+			false,
+		)
+
+		if err != nil && !dv.config.Force {
+			return err
+		}
+
+		if exists {
+			fmt.Println("[-]", volume)
+		}
+	}
+
 	return nil
 }
 

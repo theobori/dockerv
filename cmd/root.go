@@ -58,6 +58,22 @@ A point can be:
 	}
 )
 
+func dockerVExecute() error {
+	dv, err := dockerv.NewDockerV(cli, &dvConfig)
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return err
+	}
+
+	if err := dv.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return err
+	}
+
+	return nil
+}
+
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

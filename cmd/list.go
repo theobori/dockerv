@@ -36,20 +36,15 @@ var listCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
 
-		dv, err := dockerv.NewDockerV(cli, &dvConfig)
+		dvConfig.Kind = dockerv.List
 
-		if err != nil {
+		if err := dockerVExecute(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
-		}
-
-		if err := dv.Execute(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
 		}
 	},
 }
 
 func init() {
-	dvConfig.Kind = dockerv.List
-
 	rootCmd.AddCommand(listCmd)
 }

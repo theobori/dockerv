@@ -91,11 +91,11 @@ var IsDockerCompose = func(path string) (bool, error) {
 
 	nameFull := strings.Split(filepath.Base(path), ".")
 	name := nameFull[0]
-	ext := nameFull[len(nameFull) - 1]
+	ext := nameFull[len(nameFull)-1]
 
 	return name == docker.DockerComposeFilename &&
-		isYaml &&
-		(ext == "yml" || ext == "yaml"),
+			isYaml &&
+			(ext == "yml" || ext == "yaml"),
 		nil
 }
 

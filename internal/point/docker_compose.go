@@ -32,7 +32,7 @@ func (dc *DockerComposePoint) resolveVolumeNames(volumes []string) []string {
 		return volumes
 	}
 
-	volumePrefix := splittedPath[len(splittedPath) - 2] + "_"
+	volumePrefix := splittedPath[len(splittedPath)-2] + "_"
 
 	for i, volume := range volumes {
 		volumes[i] = volumePrefix + volume

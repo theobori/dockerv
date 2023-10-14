@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package dockerv
+package file
 
 import (
 	"archive/tar"
@@ -31,13 +31,10 @@ import (
 	"strings"
 
 	"github.com/compose-spec/compose-go/loader"
+	"github.com/theobori/dockerv/internal/docker"
 )
 
-const TarballMagicBytes = 0x1f8b
-const TarballMagicBytesSize = 2
-const TarballMagicBytesOffset = 0
-
-var isDirectory = func(path string) (bool, error) {
+var IsDirectory = func(path string) (bool, error) {
 	file, err := os.Open(path)
 
 	if err != nil {
@@ -53,7 +50,7 @@ var isDirectory = func(path string) (bool, error) {
 	return fileInfo.IsDir(), nil
 }
 
-func parseYAML(path string) (map[string]any, error) {
+func ParseYAML(path string) (map[string]any, error) {
 	file, err := os.Open(path)
 
 	if err != nil {
@@ -75,8 +72,8 @@ func parseYAML(path string) (map[string]any, error) {
 	return yamlData, nil
 }
 
-var isYAML = func(path string) (bool, error) {
-	_, err := parseYAML(path)
+var IsYAML = func(path string) (bool, error) {
+	_, err := ParseYAML(path)
 
 	if err != nil {
 		return false, err
@@ -85,8 +82,8 @@ var isYAML = func(path string) (bool, error) {
 	return true, nil
 }
 
-var isDockerCompose = func(path string) (bool, error) {
-	isYaml, err := isYAML(path)
+var IsDockerCompose = func(path string) (bool, error) {
+	isYaml, err := IsYAML(path)
 
 	if err != nil {
 		return false, err
@@ -94,11 +91,11 @@ var isDockerCompose = func(path string) (bool, error) {
 
 	name := strings.Split(filepath.Base(path), ".")[0]
 
-	return name == DockerComposeFilename &&
+	return name == docker.DockerComposeFilename &&
 		isYaml, nil
 }
 
-var isTarball = func(path string) (bool, error) {
+var IsTarball = func(path string) (bool, error) {
 	file, err := os.Open(path)
 
 	if err != nil {
@@ -118,53 +115,4 @@ var isTarball = func(path string) (bool, error) {
 	}
 
 	return true, nil
-}
-
-func volumesFromDockerCompose(path string) (Volumes, error) {
-	yamlData, err := parseYAML(path)
-
-	if err != nil {
-		return Volumes{}, err
-	}
-
-	volumes, ok := yamlData["volumes"].(map[string]any)
-
-	if !ok {
-		return Volumes{}, err
-	}
-
-	return mapKeys(volumes), nil
-}
-
-// TODO: Handle tarball
-func volumesFromDirectory(path string) (Volumes, error) {
-	volumes := Volumes{}
-
-	err := filepath.Walk(path,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-
-			isDockerCompose, _ := isDockerCompose(path)
-
-			if isDockerCompose {
-				dcVolumes, _ := volumesFromDockerCompose(path)
-
-				volumes = append(volumes, dcVolumes...)
-			}
-
-			return nil
-		},
-	)
-
-	if err != nil {
-		return Volumes{}, err
-	}
-
-	return volumes, nil
-}
-
-func volumesFromTarball(file *os.File) (Volumes, error) {
-	return Volumes{}, nil
 }

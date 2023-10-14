@@ -26,9 +26,11 @@ import (
 	"fmt"
 
 	"github.com/docker/docker/client"
+	"github.com/theobori/dockerv/internal/point"
 )
 
 type ActionKind int
+type Volumes []string
 
 const (
 	Import ActionKind = 0
@@ -41,48 +43,63 @@ const (
 
 type DockerVConfig struct {
 	Kind             ActionKind
-	PointSource      Point
-	PointDestination Point
+	PointSource      string
+	PointDestination *string
 }
 
-type Executes map[ActionKind]func() error
+type ExecutesValueField struct {
+	needDestination bool
+	callback        func() error
+}
+type Executes map[ActionKind]ExecutesValueField
 
 type DockerV struct {
 	config DockerVConfig
 	cli    *client.Client
 
+	source      *point.Point
+	destination *point.Point
+
 	executes Executes
 }
 
-func NewDockerV(config *DockerVConfig) (*DockerV, error) {
+func NewDockerV(cli *client.Client, config *DockerVConfig) (*DockerV, error) {
 	executes := make(Executes)
+
+	var pointDestination *point.Point
+
+	if config.PointDestination != nil {
+		pointDestination = point.PointFromValue(
+			cli,
+			*config.PointDestination,
+		)
+	}
 
 	dv := DockerV{
 		*config,
-		nil,
+		cli,
+		point.PointFromValue(cli, config.PointSource),
+		pointDestination,
 		executes,
 	}
 
-	dv.executes[Import] = dv._import
-	dv.executes[Export] = dv.export
-	dv.executes[Copy] = dv.copy
-	dv.executes[Move] = dv.move
-	dv.executes[List] = dv.list
-	dv.executes[Remove] = dv.remove
+	dv.executes[Import] = ExecutesValueField{true, dv._import}
+	dv.executes[Export] = ExecutesValueField{true, dv.export}
+	dv.executes[Copy] = ExecutesValueField{true, dv.copy}
+	dv.executes[Move] = ExecutesValueField{true, dv.move}
+	dv.executes[List] = ExecutesValueField{false, dv.list}
+	dv.executes[Remove] = ExecutesValueField{false, dv.remove}
 
 	return &dv, nil
 }
 
-func NewDefaultDockerV() (*DockerV, error) {
+func NewDefaultDockerV(cli *client.Client) (*DockerV, error) {
 	return NewDockerV(
+		cli,
 		&DockerVConfig{
 			Kind: Export,
 		},
 	)
-}
-
-func (dv *DockerV) SetDockerClient(cli *client.Client) {
-	dv.cli = cli
 }
 
 func (dv *DockerV) SetConfig(config *DockerVConfig) {
@@ -102,7 +119,13 @@ func (dv *DockerV) export() error {
 }
 
 func (dv *DockerV) list() error {
-	for _, volume := range dv.config.PointSource.Volumes() {
+	volumes, err := (*dv.source).Volumes()
+
+	if err != nil {
+		return err
+	}
+
+	for _, volume := range volumes {
 		fmt.Println(volume)
 	}
 
@@ -122,5 +145,15 @@ func (dv *DockerV) remove() error {
 }
 
 func (dv *DockerV) Execute() error {
-	return dv.executes[dv.config.Kind]()
+	if dv.source == nil {
+		return fmt.Errorf("invalid source point")
+	}
+
+	exec := dv.executes[dv.config.Kind]
+
+	if exec.needDestination && dv.destination == nil {
+		return fmt.Errorf("invalid destination point")
+	}
+
+	return exec.callback()
 }

@@ -26,7 +26,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal"
 )
 
 // copyCmd represents the copy command
@@ -38,7 +37,7 @@ var copyCmd = &cobra.Command{
 }
 
 func init() {
-	pointDestValue := copyCmd.PersistentFlags().String(
+	copyCmd.PersistentFlags().String(
 		"dest",
 		".",
 		"The destination point",
@@ -46,11 +45,4 @@ func init() {
 	copyCmd.MarkPersistentFlagRequired("dest")
 
 	rootCmd.AddCommand(copyCmd)
-
-	PointDestination := dockerv.NewPoint(*pointDestValue)
-	PointDestination.SetClient(cli)
-
-	dvConfig.PointDestination = PointDestination
-
-	dv.SetConfig(&dvConfig)
 }

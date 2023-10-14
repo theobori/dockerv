@@ -29,10 +29,10 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 	dockerv "github.com/theobori/dockerv/internal"
+	"github.com/theobori/dockerv/internal/point"
 )
 
 var (
-	dv, _    = dockerv.NewDefaultDockerV()
 	dvConfig = dockerv.DockerVConfig{}
 
 	cli *client.Client
@@ -53,24 +53,13 @@ A point can be:
 	- A directory
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			dv.SetConfig(&dvConfig)
+
 		},
 	}
 )
 
-func initPoint(cmd *cobra.Command, pointDest *dockerv.Point, argName string) {
-	pointSrcValue, _ := cmd.Flags().GetString(argName)
-
-	point := dockerv.NewPoint(pointSrcValue)
-	point.SetClient(cli)
-
-	*pointDest = point
-
-	dv.SetConfig(&dvConfig)
-}
-
 func Execute() {
-	if err := rootCmd.Execute(); err != nil || dv == nil {
+	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -85,7 +74,7 @@ func init() {
 	rootCmd.MarkPersistentFlagRequired("src")
 
 	// DockerV setup
-	dockerv.InitPointKindFuncs()
+	point.Init()
 
 	var err error
 
@@ -96,6 +85,4 @@ func init() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-
-	dv.SetDockerClient(cli)
 }

@@ -20,19 +20,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package dockerv
+package common
 
-import (
-	"context"
+func MapKeys(m map[string]any) []string {
+	keys := make([]string, len(m))
+	i := 0
 
-	"github.com/docker/docker/client"
-)
+	for k := range m {
+		keys[i] = k
+		i++
+	}
 
-// Without ext
-const DockerComposeFilename = "docker-compose"
-
-func DockerVolumeExists(ctx context.Context, cli *client.Client, name string) bool {
-	_, err := cli.VolumeInspect(ctx, name)
-
-	return err == nil
+	return keys
 }

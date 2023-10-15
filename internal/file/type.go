@@ -104,20 +104,28 @@ var HasTarballExt = func(path string) (bool, error) {
 	return strings.HasSuffix(path, ".tar.gz"), nil
 }
 
-var IsTarball = func(path string) (bool, error) {
+func TarGzReader(path string) (*tar.Reader, error) {
 	file, err := os.Open(path)
 
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	gr, err := gzip.NewReader(file)
 
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	tr := tar.NewReader(gr)
+	return tar.NewReader(gr), nil
+}
+
+var IsTarball = func(path string) (bool, error) {
+	tr, err := TarGzReader(path)
+
+	if err != nil {
+		return false, nil
+	}
 
 	if _, err := tr.Next(); err != nil {
 		return false, err

@@ -23,24 +23,36 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 
+	"github.com/docker/docker/api/types/volume"
 	"github.com/spf13/cobra"
 	dockerv "github.com/theobori/dockerv/internal"
+	"github.com/theobori/dockerv/internal/docker"
 )
 
-// importCmd represents the import command
-var importCmd = &cobra.Command{
-	Use: "import",
+// copyCmd represents the export command
+var copyCmd = &cobra.Command{
+	Use: "copy",
 	Run: func(cmd *cobra.Command, args []string) {
 		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
-		dvConfig.Force, _ = cmd.Flags().GetBool("force")
-		
 		dest, _ := cmd.Flags().GetString("dest")
+		force, _ := cmd.Flags().GetBool("force")
 
 		dvConfig.PointDestination = &dest
-		dvConfig.Kind = dockerv.Import
+		dvConfig.Kind = dockerv.Copy
+
+		// Creates the destination if not exists
+		ctx := context.Background()
+
+		if force && !docker.DockerVolumeExists(ctx, cli, dest) {
+			cli.VolumeCreate(
+				ctx,
+				volume.CreateOptions{Name: dest},
+			)
+		}
 
 		if err := dockerVExecute(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -50,20 +62,20 @@ var importCmd = &cobra.Command{
 }
 
 func init() {
-	importCmd.PersistentFlags().String(
+	copyCmd.PersistentFlags().String(
 		"dest",
 		".",
-		"The destination point",
+		"The destination Docker volume",
 	)
 
-	importCmd.PersistentFlags().BoolP(
+	copyCmd.PersistentFlags().BoolP(
 		"force",
 		"f",
 		false,
-		"Ignore the destination point volumes matching the source point volumes",
+		"Creates the Docker volume if it does not exist",
 	)
 
-	importCmd.MarkPersistentFlagRequired("dest")
+	copyCmd.MarkPersistentFlagRequired("dest")
 
-	rootCmd.AddCommand(importCmd)
+	rootCmd.AddCommand(copyCmd)
 }

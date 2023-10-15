@@ -23,19 +23,59 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"os"
 
+	"github.com/docker/docker/api/types/volume"
 	"github.com/spf13/cobra"
+	dockerv "github.com/theobori/dockerv/internal"
+	"github.com/theobori/dockerv/internal/docker"
 )
 
-// moveCmd represents the move command
+// moveCmd represents the export command
 var moveCmd = &cobra.Command{
 	Use: "move",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("move called")
+		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
+		dest, _ := cmd.Flags().GetString("dest")
+		force, _ := cmd.Flags().GetBool("force")
+
+		dvConfig.PointDestination = &dest
+		dvConfig.Kind = dockerv.Move
+
+		// Creates the destination if not exists
+		ctx := context.Background()
+
+		if force && !docker.DockerVolumeExists(ctx, cli, dest) {
+			cli.VolumeCreate(
+				ctx,
+				volume.CreateOptions{Name: dest},
+			)
+		}
+
+		if err := dockerVExecute(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 	},
 }
 
 func init() {
+	moveCmd.PersistentFlags().String(
+		"dest",
+		".",
+		"The destination Docker volume",
+	)
+
+	moveCmd.PersistentFlags().BoolP(
+		"force",
+		"f",
+		false,
+		"Creates the Docker volume if it does not exist",
+	)
+
+	moveCmd.MarkPersistentFlagRequired("dest")
+
 	rootCmd.AddCommand(moveCmd)
 }

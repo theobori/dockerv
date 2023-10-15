@@ -1,17 +1,22 @@
 package point
 
 import (
+	"fmt"
+	"reflect"
+
 	"github.com/docker/docker/client"
 )
 
+var ErrOperation = fmt.Errorf("unallowed point for this operation")
+
 type Point interface {
-	Kind() PointKind
 	Volumes() ([]string, error)
-	Import([]string) error
-	Export(*Point) error
+	From([]string) error
+	To([]string) error
+	Metadata() *PointMetadata
 }
 
-type pointResolverFunc = *func(*client.Client, string) Point
+type pointResolverFunc = *func(*client.Client, *PointMetadata) Point
 
 var pointResolver = make(map[PointKind]pointResolverFunc)
 
@@ -28,20 +33,18 @@ func Init() {
 }
 
 func PointFromMetadata(cli *client.Client, metadata *PointMetadata) *Point {
-	var value string
-
 	for k, v := range pointResolver {
 		if metadata.Kind(cli) != k {
 			continue
 		}
 
 		if k == DockerVolume {
-			value = metadata.Value()
+			metadata.value = metadata.Value()
 		} else {
-			value = metadata.AbsValue()
+			metadata.value = metadata.AbsValue()
 		}
 
-		p := (*v)(cli, value)
+		p := (*v)(cli, metadata)
 
 		return &p
 	}
@@ -53,4 +56,11 @@ func PointFromValue(cli *client.Client, value string) *Point {
 	metadata := NewPointMetadata(value)
 
 	return PointFromMetadata(cli, &metadata)
+}
+
+func PointEqual(pSrc *Point, pDest *Point) bool {
+	vSrc, _ := (*pSrc).Volumes()
+	vDest, _ := (*pDest).Volumes()
+
+	return reflect.DeepEqual(vSrc, vDest)
 }

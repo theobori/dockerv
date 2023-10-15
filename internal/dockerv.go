@@ -39,6 +39,7 @@ const (
 	Move   ActionKind = 3
 	List   ActionKind = 4
 	Remove ActionKind = 5
+	Copy   ActionKind = 6
 )
 
 type DockerVConfig struct {
@@ -88,6 +89,7 @@ func NewDockerV(cli *client.Client, config *DockerVConfig) (*DockerV, error) {
 	dv.executes[Move] = ExecutesValueField{true, dv.move}
 	dv.executes[List] = ExecutesValueField{false, dv.list}
 	dv.executes[Remove] = ExecutesValueField{false, dv.remove}
+	dv.executes[Copy] = ExecutesValueField{true, dv.copy}
 
 	return &dv, nil
 }
@@ -110,6 +112,36 @@ func (dv *DockerV) Config() DockerVConfig {
 }
 
 func (dv *DockerV) _import() error {
+	volumesDest, err := (*dv.destination).Volumes()
+
+	if err != nil {
+		return err
+	}
+
+
+	if err := (*dv.source).To(volumesDest); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (dv *DockerV) copy() error {
+	ok := true
+
+	ok = ok && (*dv.source).Metadata().Kind(dv.cli) == point.DockerVolume
+	ok = ok && (*dv.destination).Metadata().Kind(dv.cli) == point.DockerVolume
+
+	if !ok {
+		return point.ErrOperation
+	}
+
+	volumesSrc, _ := (*dv.source).Volumes()
+
+	if err := (*dv.destination).From(volumesSrc); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -120,7 +152,7 @@ func (dv *DockerV) export() error {
 		return err
 	}
 
-	if err := (*dv.destination).Import(volumesSrc); err != nil {
+	if err := (*dv.destination).From(volumesSrc); err != nil {
 		return err
 	}
 
@@ -161,6 +193,20 @@ func (dv *DockerV) list() error {
 }
 
 func (dv *DockerV) move() error {
+	if err := dv.copy(); err != nil {
+		return err
+	}
+
+	err := dv.cli.VolumeRemove(
+		context.Background(),
+		(*dv.source).Metadata().Value(),
+		false,
+	)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -9,23 +9,23 @@ import (
 )
 
 type DockerComposePoint struct {
-	value string
+	metadata *PointMetadata
 	cli   *client.Client
 }
 
-var NewDockerComposePoint = func(cli *client.Client, value string) Point {
+var NewDockerComposePoint = func(cli *client.Client, metadata *PointMetadata) Point {
 	return &DockerComposePoint{
-		value,
+		metadata,
 		cli,
 	}
 }
 
-func (d *DockerComposePoint) Kind() PointKind {
-	return DockerCompose
+func (d *DockerComposePoint) Metadata() *PointMetadata {
+	return d.metadata
 }
 
 func (d *DockerComposePoint) resolveVolumeNames(volumes []string) []string {
-	dir, err := common.PreviousDirName(d.value)
+	dir, err := common.PreviousDirName(d.metadata.value)
 
 	if err != nil {
 		return volumes
@@ -41,7 +41,7 @@ func (d *DockerComposePoint) resolveVolumeNames(volumes []string) []string {
 }
 
 func (d *DockerComposePoint) Volumes() ([]string, error) {
-	yamlData, err := file.ParseYAML(d.value)
+	yamlData, err := file.ParseYAML(d.metadata.value)
 
 	if err != nil {
 		return []string{}, err
@@ -58,10 +58,10 @@ func (d *DockerComposePoint) Volumes() ([]string, error) {
 	return d.resolveVolumeNames(volumesKeys), nil
 }
 
-func (d *DockerComposePoint) Import([]string) error {
-	return nil
+func (d *DockerComposePoint) From([]string) error {
+	return ErrOperation
 }
 
-func (d *DockerComposePoint) Export(p *Point) error {
-	return nil
+func (d *DockerComposePoint) To([]string) error {
+	return ErrOperation
 }

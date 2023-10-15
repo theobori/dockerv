@@ -42,6 +42,10 @@ func MapKeys(m map[string]any) []string {
 	return keys
 }
 
+func FilenameWithoutExt(path string) string {
+	return strings.Split(filepath.Base(path), ".")[0]
+}
+
 func PreviousDirName(path string) (string, error) {
 	if isDir, _ := file.IsDirectory(path); isDir {
 		return path, nil

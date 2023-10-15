@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
-	"reflect"
 	"strings"
 
 	"github.com/docker/docker/api/types/mount"
@@ -16,11 +15,12 @@ import (
 	"github.com/theobori/dockerv/common"
 	"github.com/theobori/dockerv/internal/docker"
 	"github.com/theobori/dockerv/internal/file"
+	"golang.org/x/exp/slices"
 )
 
 type TarballPoint struct {
 	metadata *PointMetadata
-	cli   *client.Client
+	cli      *client.Client
 }
 
 var NewTarballPoint = func(cli *client.Client, metadata *PointMetadata) Point {
@@ -58,8 +58,8 @@ func (t *TarballPoint) Volumes() ([]string, error) {
 
 		if volumeName == "" {
 			continue
-
 		}
+
 		if !strings.HasSuffix(header.Name, ".tar.gz") {
 			return []string{}, fmt.Errorf("invalid file format")
 		}
@@ -155,26 +155,26 @@ func (t *TarballPoint) From(vSrc []string) error {
 }
 
 func (t *TarballPoint) To(vDest []string) error {
-	vSrc, _ := t.Volumes()
-
-	if !reflect.DeepEqual(vSrc, vDest) {
-		return fmt.Errorf("the destination point does not have the required volumes")
-	}
-
 	ctx := context.Background()
+	vSrc, _ := t.Volumes()
 
 	filenameBase := filepath.Base(t.metadata.value)
 
 	for _, volume := range vDest {
+		if !slices.Contains(vSrc, volume) {
+			fmt.Println("Skip", volume)
+			continue
+		}
+
 		err := docker.ExecContainer(
 			ctx,
 			t.cli,
 			&strslice.StrSlice{
 				"/bin/sh", "-c",
 				"tar -xzvf " +
-				"/" + filenameBase + " ./" + volume +
-				".tar.gz " + "-C / && tar -xzvf " +
-				"/" + volume + ".tar.gz" + " -C /dest",
+					"/" + filenameBase + " ./" + volume +
+					".tar.gz " + "-C / && tar -xzvf " +
+					"/" + volume + ".tar.gz" + " -C /dest",
 			},
 			&[]mount.Mount{
 				{
@@ -189,7 +189,7 @@ func (t *TarballPoint) To(vDest []string) error {
 				},
 			},
 		)
-	
+
 		if err != nil {
 			return err
 		}

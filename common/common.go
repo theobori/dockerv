@@ -28,6 +28,7 @@ import (
 	"strings"
 
 	"github.com/theobori/dockerv/internal/file"
+	"golang.org/x/exp/slices"
 )
 
 func MapKeys(m map[string]any) []string {
@@ -67,4 +68,14 @@ func PopFilename(path string) string {
 		"",
 		-1,
 	)
+}
+
+func IsSliceinSlice[T comparable](src []T, dest []T) bool {
+	for _, e := range dest {
+		if !slices.Contains(src, e) {
+			return false
+		}
+	}
+
+	return true
 }

@@ -27,6 +27,7 @@ import (
 	"fmt"
 
 	"github.com/docker/docker/client"
+	"github.com/theobori/dockerv/common"
 	"github.com/theobori/dockerv/internal/docker"
 	"github.com/theobori/dockerv/internal/point"
 )
@@ -112,14 +113,14 @@ func (dv *DockerV) Config() DockerVConfig {
 }
 
 func (dv *DockerV) _import() error {
-	volumesDest, err := (*dv.destination).Volumes()
+	vDest, _ := (*dv.destination).Volumes()
+	vSrc, _ := (*dv.source).Volumes()
 
-	if err != nil {
-		return err
+	if !dv.config.Force && !common.IsSliceinSlice(vDest, vSrc) {
+		return fmt.Errorf("missing destination point volumes")
 	}
 
-
-	if err := (*dv.source).To(volumesDest); err != nil {
+	if err := (*dv.source).To(vDest); err != nil {
 		return err
 	}
 
@@ -136,9 +137,9 @@ func (dv *DockerV) copy() error {
 		return point.ErrOperation
 	}
 
-	volumesSrc, _ := (*dv.source).Volumes()
+	vSrc, _ := (*dv.source).Volumes()
 
-	if err := (*dv.destination).From(volumesSrc); err != nil {
+	if err := (*dv.destination).From(vSrc); err != nil {
 		return err
 	}
 
@@ -146,13 +147,13 @@ func (dv *DockerV) copy() error {
 }
 
 func (dv *DockerV) export() error {
-	volumesSrc, err := (*dv.source).Volumes()
+	vSrc, err := (*dv.source).Volumes()
 
 	if err != nil {
 		return err
 	}
 
-	if err := (*dv.destination).From(volumesSrc); err != nil {
+	if err := (*dv.destination).From(vSrc); err != nil {
 		return err
 	}
 

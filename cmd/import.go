@@ -36,7 +36,7 @@ var importCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
 		dvConfig.Force, _ = cmd.Flags().GetBool("force")
-		
+
 		dest, _ := cmd.Flags().GetString("dest")
 
 		dvConfig.PointDestination = &dest
@@ -60,7 +60,7 @@ func init() {
 		"force",
 		"f",
 		false,
-		"Ignore the destination point volumes matching the source point volumes",
+		"Ignore the destination point volumes not fully matching the source point volumes",
 	)
 
 	importCmd.MarkPersistentFlagRequired("dest")

@@ -9,7 +9,7 @@ import (
 
 type DirectoryPoint struct {
 	metadata *PointMetadata
-	cli   *client.Client
+	cli      *client.Client
 }
 
 var NewDirectoryPoint = func(cli *client.Client, metadata *PointMetadata) Point {

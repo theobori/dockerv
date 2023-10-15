@@ -10,7 +10,7 @@ import (
 
 type DockerComposePoint struct {
 	metadata *PointMetadata
-	cli   *client.Client
+	cli      *client.Client
 }
 
 var NewDockerComposePoint = func(cli *client.Client, metadata *PointMetadata) Point {

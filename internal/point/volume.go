@@ -9,7 +9,7 @@ import (
 
 type DockerVolumePoint struct {
 	metadata *PointMetadata
-	cli   *client.Client
+	cli      *client.Client
 }
 
 var NewDockerVolumePoint = func(cli *client.Client, metadata *PointMetadata) Point {
@@ -49,5 +49,5 @@ func (d *DockerVolumePoint) From(vSrc []string) error {
 }
 
 func (d *DockerVolumePoint) To(vDest []string) error {
-	return d.copy(d.metadata.value, d.headVolume(vDest))
+	return ErrOperation
 }

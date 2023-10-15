@@ -7,7 +7,7 @@ import (
 	"github.com/docker/docker/client"
 )
 
-var ErrOperation = fmt.Errorf("unallowed point for this operation")
+var ErrOperation = fmt.Errorf("this operation with this point is not authorized")
 
 type Point interface {
 	Volumes() ([]string, error)

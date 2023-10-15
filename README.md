@@ -1,5 +1,7 @@
 # 🐋+📦 dockerv
 
+![build](https://github.com/theobori/dockerv/actions/workflows/build.yml/badge.svg)
+
 A simple to use (KISS) CLI to backup Docker volumes.
 
 ## 📖 How to build and run ?

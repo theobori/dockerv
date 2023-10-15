@@ -70,3 +70,4 @@ dockerv move \
 - [ ] Documentation 80%
 - [ ] Custom volume destination for single source volume packed
 - [ ] `create` command
+- [ ] Export output permissions

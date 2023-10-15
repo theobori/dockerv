@@ -36,7 +36,6 @@ type ActionKind int
 const (
 	Import ActionKind = 0
 	Export ActionKind = 1
-	Copy   ActionKind = 2
 	Move   ActionKind = 3
 	List   ActionKind = 4
 	Remove ActionKind = 5
@@ -47,7 +46,7 @@ type DockerVConfig struct {
 	PointSource      string
 	PointDestination *string
 	Force            bool
-	State bool
+	State            bool
 }
 
 type ExecutesValueField struct {
@@ -86,7 +85,6 @@ func NewDockerV(cli *client.Client, config *DockerVConfig) (*DockerV, error) {
 
 	dv.executes[Import] = ExecutesValueField{true, dv._import}
 	dv.executes[Export] = ExecutesValueField{true, dv.export}
-	dv.executes[Copy] = ExecutesValueField{true, dv.copy}
 	dv.executes[Move] = ExecutesValueField{true, dv.move}
 	dv.executes[List] = ExecutesValueField{false, dv.list}
 	dv.executes[Remove] = ExecutesValueField{false, dv.remove}
@@ -116,12 +114,22 @@ func (dv *DockerV) _import() error {
 }
 
 func (dv *DockerV) export() error {
+	volumesSrc, err := (*dv.source).Volumes()
+
+	if err != nil {
+		return err
+	}
+
+	if err := (*dv.destination).Import(volumesSrc); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (dv *DockerV) list() error {
 	var existsMsg string
-	
+
 	volumes, err := (*dv.source).Volumes()
 
 	if err != nil {
@@ -153,10 +161,6 @@ func (dv *DockerV) list() error {
 }
 
 func (dv *DockerV) move() error {
-	return nil
-}
-
-func (dv *DockerV) copy() error {
 	return nil
 }
 

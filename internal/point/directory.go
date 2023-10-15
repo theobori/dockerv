@@ -1,6 +1,7 @@
 package point
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -19,20 +20,20 @@ var NewDirectoryPoint = func(cli *client.Client, value string) Point {
 	}
 }
 
-func (dp *DirectoryPoint) Kind() PointKind {
+func (d *DirectoryPoint) Kind() PointKind {
 	return Directory
 }
 
-func (dp *DirectoryPoint) Volumes() ([]string, error) {
+func (d *DirectoryPoint) Volumes() ([]string, error) {
 	volumes := []string{}
 
-	err := filepath.Walk(dp.value,
+	err := filepath.Walk(d.value,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 
-			p := PointFromValue(dp.cli, path)
+			p := PointFromValue(d.cli, path)
 
 			if p == nil {
 				return nil
@@ -61,10 +62,10 @@ func (dp *DirectoryPoint) Volumes() ([]string, error) {
 	return volumes, nil
 }
 
-func (dp *DirectoryPoint) Import([]string) error {
-	return nil
+func (d *DirectoryPoint) Import([]string) error {
+	return fmt.Errorf("unallowed point for this operation")
 }
 
-func (dp *DirectoryPoint) Export(p *Point) error {
+func (d *DirectoryPoint) Export(p *Point) error {
 	return nil
 }

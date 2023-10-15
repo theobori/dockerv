@@ -19,6 +19,7 @@ func InitPointResolvers() {
 	pointResolver[DockerCompose] = &NewDockerComposePoint
 	pointResolver[Directory] = &NewDirectoryPoint
 	pointResolver[DockerVolume] = &NewDockerVolumePoint
+	pointResolver[Tarball] = &NewTarballPoint
 }
 
 func Init() {

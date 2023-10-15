@@ -24,18 +24,46 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	dockerv "github.com/theobori/dockerv/internal"
 )
 
 // exportCmd represents the export command
 var exportCmd = &cobra.Command{
 	Use: "export",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("export called")
+		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
+		dvConfig.Force, _ = cmd.Flags().GetBool("force")
+
+		dest, _ := cmd.Flags().GetString("dest")
+
+		dvConfig.PointDestination = &dest
+		dvConfig.Kind = dockerv.Export
+
+		if err := dockerVExecute(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 	},
 }
 
 func init() {
+	exportCmd.PersistentFlags().String(
+		"dest",
+		".",
+		"The destination point",
+	)
+
+	exportCmd.PersistentFlags().BoolP(
+		"force",
+		"f",
+		false,
+		"Ignore the Docker volumes that does not exist",
+	)
+
+	exportCmd.MarkPersistentFlagRequired("dest")
+
 	rootCmd.AddCommand(exportCmd)
 }

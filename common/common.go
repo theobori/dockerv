@@ -22,6 +22,14 @@ THE SOFTWARE.
 
 package common
 
+import (
+	"fmt"
+	"path/filepath"
+	"strings"
+
+	"github.com/theobori/dockerv/internal/file"
+)
+
 func MapKeys(m map[string]any) []string {
 	keys := make([]string, len(m))
 	i := 0
@@ -32,4 +40,27 @@ func MapKeys(m map[string]any) []string {
 	}
 
 	return keys
+}
+
+func PreviousDirName(path string) (string, error) {
+	if isDir, _ := file.IsDirectory(path); isDir {
+		return path, nil
+	}
+
+	splittedPath := strings.Split(path, "/")
+
+	if len(splittedPath) < 2 {
+		return "", fmt.Errorf("unable to resolve the previous dir")
+	}
+
+	return splittedPath[len(splittedPath)-2], nil
+}
+
+func PopFilename(path string) string {
+	return strings.Replace(
+		path,
+		filepath.Base(path),
+		"",
+		-1,
+	)
 }

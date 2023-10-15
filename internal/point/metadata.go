@@ -52,6 +52,7 @@ func InitPointKindFuncs() {
 	pointKindFuncs[&file.IsDirectory] = Directory
 	pointKindFuncs[&file.IsDockerCompose] = DockerCompose
 	pointKindFuncs[&file.IsTarball] = Tarball
+	pointKindFuncs[&file.HasTarballExt] = Tarball
 }
 
 type PointMetadata struct {

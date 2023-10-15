@@ -2,7 +2,10 @@ module github.com/theobori/dockerv
 
 go 1.19
 
-require github.com/docker/docker v24.0.6+incompatible
+require (
+	github.com/docker/docker v24.0.6+incompatible
+	github.com/google/uuid v1.3.1
+)
 
 require (
 	github.com/imdario/mergo v0.3.16 // indirect

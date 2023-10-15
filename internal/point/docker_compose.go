@@ -2,7 +2,6 @@ package point
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/docker/docker/client"
 	"github.com/theobori/dockerv/common"
@@ -21,18 +20,18 @@ var NewDockerComposePoint = func(cli *client.Client, value string) Point {
 	}
 }
 
-func (dc *DockerComposePoint) Kind() PointKind {
+func (d *DockerComposePoint) Kind() PointKind {
 	return DockerCompose
 }
 
-func (dc *DockerComposePoint) resolveVolumeNames(volumes []string) []string {
-	splittedPath := strings.Split(dc.value, "/")
+func (d *DockerComposePoint) resolveVolumeNames(volumes []string) []string {
+	dir, err := common.PreviousDirName(d.value)
 
-	if len(splittedPath) < 2 {
+	if err != nil {
 		return volumes
 	}
 
-	volumePrefix := splittedPath[len(splittedPath)-2] + "_"
+	volumePrefix := dir + "_"
 
 	for i, volume := range volumes {
 		volumes[i] = volumePrefix + volume
@@ -41,8 +40,8 @@ func (dc *DockerComposePoint) resolveVolumeNames(volumes []string) []string {
 	return volumes
 }
 
-func (dc *DockerComposePoint) Volumes() ([]string, error) {
-	yamlData, err := file.ParseYAML(dc.value)
+func (d *DockerComposePoint) Volumes() ([]string, error) {
+	yamlData, err := file.ParseYAML(d.value)
 
 	if err != nil {
 		return []string{}, err
@@ -56,13 +55,13 @@ func (dc *DockerComposePoint) Volumes() ([]string, error) {
 
 	volumesKeys := common.MapKeys(volumesField)
 
-	return dc.resolveVolumeNames(volumesKeys), nil
+	return d.resolveVolumeNames(volumesKeys), nil
 }
 
-func (dc *DockerComposePoint) Import([]string) error {
+func (d *DockerComposePoint) Import([]string) error {
 	return nil
 }
 
-func (dc *DockerComposePoint) Export(p *Point) error {
+func (d *DockerComposePoint) Export(p *Point) error {
 	return nil
 }

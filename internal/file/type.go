@@ -99,6 +99,11 @@ var IsDockerCompose = func(path string) (bool, error) {
 		nil
 }
 
+// Created for the destination points
+var HasTarballExt = func(path string) (bool, error) {
+	return strings.HasSuffix(path, ".tar.gz"), nil
+}
+
 var IsTarball = func(path string) (bool, error) {
 	file, err := os.Open(path)
 

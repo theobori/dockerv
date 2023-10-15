@@ -22,6 +22,5 @@ go.work
 
 dockerv
 vendor
-go.sum
 
 *.tar.gz

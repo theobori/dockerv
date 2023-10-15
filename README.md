@@ -73,3 +73,5 @@ dockerv move \
 - [ ] Custom volume destination for single source volume packed
 - [ ] `create` command
 - [ ] Export output permissions
+- [ ] Support Docker volume list for `DockerVolumePoint`
+- [ ] Output every operation

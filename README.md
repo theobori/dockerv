@@ -11,7 +11,7 @@ A simple to use (KISS) CLI to backup Docker volumes.
 2. Install the binary
    
 ```bash
-go install github.com/theobori/dockerv
+go install github.com/theobori/dockerv@latest
 ```
 
 ## 🤝 Contribute
@@ -20,7 +20,7 @@ If you want to help the project, you can follow the guidelines in [CONTRIBUTING.
 
 ## ⭐ Use cases
 
-#### Export Docker volumes
+Export Docker volumes
 
 ```bash
 dockerv export \
@@ -28,7 +28,7 @@ dockerv export \
     --dest "volumes.tar.gz
 ```
 
-#### Import Docker volumes
+Import Docker volumes
 
 ```bash
 dockerv import \
@@ -36,12 +36,30 @@ dockerv import \
     --dest "relative_or_absolute_path/docker-compose.yml"
 ```
 
-#### List recursively Docker volumes in docker compose files
+List recursively Docker volumes in docker compose files or tarball
 
 ```bash
 dockerv list \
     --src "./" \
     --state
+```
+
+Copy Docker volume content to another 
+
+```bash
+dockerv copy \
+    --src "volume_src" \
+    --dest "volume_dest" \
+    --force
+```
+
+Copy then remove the Docker volume 
+
+```bash
+dockerv move \
+    --src "volume_src" \
+    --dest "volume_dest" \
+    --force
 ```
 
 ## 🎉 Tasks
@@ -51,3 +69,4 @@ dockerv list \
 - [x] Dynamic and scalable point identification
 - [ ] Documentation 80%
 - [ ] Custom volume destination for single source volume packed
+- [ ] `create` command

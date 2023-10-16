@@ -27,7 +27,7 @@ func (d *DirectoryPoint) Volumes() ([]string, error) {
 	volumes := []string{}
 
 	err := filepath.Walk(d.metadata.value,
-		func(path string, info os.FileInfo, err error) error {
+		func(path string, _ os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}

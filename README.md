@@ -15,6 +15,11 @@ A simple to use (KISS) CLI to backup Docker volumes.
 ```bash
 go install github.com/theobori/dockerv@latest
 ```
+3. Then you can start using it
+
+```bash
+dockerv -h
+```
 
 ## 🤝 Contribute
 
@@ -69,9 +74,10 @@ dockerv move \
 - [x] tarball export
 - [ ] zip export
 - [x] Dynamic and scalable point identification
-- [ ] Documentation 80%
+- [ ] Documentation + (commands help)
 - [ ] Custom volume destination for single source volume packed
-- [ ] `create` command
+- [ ] `import` without dest
 - [ ] Export output permissions
 - [ ] Support Docker volume list for `DockerVolumePoint`
 - [ ] Output every operation
+- [ ] Export multiple source ?

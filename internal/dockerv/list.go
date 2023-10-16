@@ -20,62 +20,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package cmd
+package dockerv
 
 import (
 	"context"
 	"fmt"
-	"os"
 
-	"github.com/docker/docker/api/types/volume"
-	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal/dockerv"
 	"github.com/theobori/dockerv/internal/docker"
 )
 
-// copyCmd represents the export command
-var copyCmd = &cobra.Command{
-	Use: "copy",
-	Run: func(cmd *cobra.Command, _ []string) {
-		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
-		dest, _ := cmd.Flags().GetString("dest")
-		force, _ := cmd.Flags().GetBool("force")
+func (dv *DockerV) list(vSrc *[]string) error {
+	var existsMsg string
 
-		dvConfig.PointDest = &dest
-		dvConfig.Kind = dockerv.Copy
+	for _, volume := range *vSrc {
+		exists := docker.DockerVolumeExists(
+			context.Background(),
+			dv.cli,
+			volume,
+		)
 
-		// Creates the destination if not exists
-		ctx := context.Background()
-
-		if force && !docker.DockerVolumeExists(ctx, cli, dest) {
-			cli.VolumeCreate(
-				ctx,
-				volume.CreateOptions{Name: dest},
-			)
+		if !dv.config.State {
+			fmt.Println(volume)
+			continue
 		}
 
-		if err := dockerVExecute(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+		if exists {
+			existsMsg = "[exists]"
+		} else {
+			existsMsg = "[No such volume]"
 		}
-	},
-}
 
-func init() {
-	copyCmd.PersistentFlags().String(
-		"dest",
-		".",
-		"The destination Docker volume",
-	)
+		fmt.Println(existsMsg, volume)
+	}
 
-	copyCmd.PersistentFlags().BoolP(
-		"force",
-		"f",
-		false,
-		"Creates the Docker volume if it does not exist",
-	)
-
-	copyCmd.MarkPersistentFlagRequired("dest")
-
-	rootCmd.AddCommand(copyCmd)
+	return nil
 }

@@ -27,14 +27,14 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal"
+	dockerv "github.com/theobori/dockerv/internal/dockerv"
 )
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use: "list",
-	Run: func(cmd *cobra.Command, args []string) {
-		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
+	Run: func(cmd *cobra.Command, _ []string) {
+		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
 		dvConfig.State, _ = cmd.Flags().GetBool("state")
 
 		dvConfig.Kind = dockerv.List

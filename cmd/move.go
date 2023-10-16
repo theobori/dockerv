@@ -29,19 +29,19 @@ import (
 
 	"github.com/docker/docker/api/types/volume"
 	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal"
 	"github.com/theobori/dockerv/internal/docker"
+	dockerv "github.com/theobori/dockerv/internal/dockerv"
 )
 
 // moveCmd represents the export command
 var moveCmd = &cobra.Command{
 	Use: "move",
-	Run: func(cmd *cobra.Command, args []string) {
-		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
+	Run: func(cmd *cobra.Command, _ []string) {
+		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
 		dest, _ := cmd.Flags().GetString("dest")
 		force, _ := cmd.Flags().GetBool("force")
 
-		dvConfig.PointDestination = &dest
+		dvConfig.PointDest = &dest
 		dvConfig.Kind = dockerv.Move
 
 		// Creates the destination if not exists

@@ -20,50 +20,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package cmd
+package dockerv
 
 import (
-	"fmt"
-	"os"
+	"context"
 
-	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal/dockerv"
+	"github.com/theobori/dockerv/internal/point"
 )
 
-// exportCmd represents the export command
-var exportCmd = &cobra.Command{
-	Use: "export",
-	Run: func(cmd *cobra.Command, _ []string) {
-		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
-		dvConfig.Force, _ = cmd.Flags().GetBool("force")
+func (dv *DockerV) move(vSrc *[]string) error {
+	if len(dv.source) != 1 {
+		return point.ErrOperation
+	}
 
-		dest, _ := cmd.Flags().GetString("dest")
+	pSrc := dv.source[0]
 
-		dvConfig.PointDest = &dest
-		dvConfig.Kind = dockerv.Export
+	if err := dv.copy(vSrc); err != nil {
+		return err
+	}
 
-		if err := dockerVExecute(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-	},
-}
-
-func init() {
-	exportCmd.PersistentFlags().String(
-		"dest",
-		".",
-		"The destination point",
-	)
-
-	exportCmd.PersistentFlags().BoolP(
-		"force",
-		"f",
+	err := dv.cli.VolumeRemove(
+		context.Background(),
+		(*pSrc).Metadata().Value(),
 		false,
-		"Ignore the Docker volumes that does not exist",
 	)
 
-	exportCmd.MarkPersistentFlagRequired("dest")
+	if err != nil {
+		return err
+	}
 
-	rootCmd.AddCommand(exportCmd)
+	return nil
 }

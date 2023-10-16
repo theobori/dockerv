@@ -77,7 +77,5 @@ dockerv move \
 - [ ] Documentation + (commands help)
 - [ ] Custom volume destination for single source volume packed
 - [ ] `import` without dest
-- [ ] Export output permissions
-- [ ] Support Docker volume list for `DockerVolumePoint`
-- [ ] Output every operation
-- [ ] Export multiple source ?
+- [x] Export output permissions
+- [x] Support multi `--src`

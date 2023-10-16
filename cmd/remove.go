@@ -27,14 +27,14 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal"
+	dockerv "github.com/theobori/dockerv/internal/dockerv"
 )
 
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
 	Use: "remove",
-	Run: func(cmd *cobra.Command, args []string) {
-		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
+	Run: func(cmd *cobra.Command, _ []string) {
+		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
 		dvConfig.Force, _ = cmd.Flags().GetBool("force")
 
 		dvConfig.Kind = dockerv.Remove

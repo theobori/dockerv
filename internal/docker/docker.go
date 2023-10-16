@@ -44,6 +44,18 @@ func DockerVolumeExists(ctx context.Context, cli *client.Client, name string) bo
 	return err == nil
 }
 
+func DockerGetVolumesExist(ctx context.Context, cli *client.Client, names []string) []string {
+	ret := []string{}
+	
+	for _, name := range names {
+		if DockerVolumeExists(ctx, cli, name) {
+			ret = append(ret, name)
+		}
+	}
+
+	return ret
+}
+
 func containerStartAutoRemove(ctx context.Context, cli *client.Client, id string) error {
 	var err error
 
@@ -74,13 +86,25 @@ func containerStartAutoRemove(ctx context.Context, cli *client.Client, id string
 	return nil
 }
 
-func ExecContainer(ctx context.Context, cli *client.Client, command *strslice.StrSlice, mounts *[]mount.Mount) error {
+func ExecContainer(
+	ctx context.Context,
+	cli *client.Client,
+	command *strslice.StrSlice,
+	mounts *[]mount.Mount,
+	user string,
+) error {
+	config := container.Config{
+		Cmd:   *command,
+		Image: DockerImage,
+	}
+
+	if user != "" {
+		config.User = user
+	}
+	
 	resp, err := cli.ContainerCreate(
 		ctx,
-		&container.Config{
-			Cmd:   *command,
-			Image: DockerImage,
-		},
+		&config,
 		&container.HostConfig{
 			Mounts: *mounts,
 		}, nil, nil, "",
@@ -97,7 +121,12 @@ func ExecContainer(ctx context.Context, cli *client.Client, command *strslice.St
 	return nil
 }
 
-func DockerVolumeCopy(ctx context.Context, cli *client.Client, vSrc string, vDest string) error {
+func DockerVolumeCopy(
+	ctx context.Context,
+	cli *client.Client,
+	vSrc string,
+	vDest string,
+) error {
 	return ExecContainer(
 		ctx,
 		cli,
@@ -115,6 +144,6 @@ func DockerVolumeCopy(ctx context.Context, cli *client.Client, vSrc string, vDes
 				Source: vDest,
 				Target: "/dest",
 			},
-		},
+		}, "",
 	)
 }

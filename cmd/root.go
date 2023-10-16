@@ -28,7 +28,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal"
+	dockerv "github.com/theobori/dockerv/internal/dockerv"
 	"github.com/theobori/dockerv/internal/point"
 )
 
@@ -52,7 +52,7 @@ A point can be:
 	- A Docker compose file
 	- A directory
 `,
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(cmd *cobra.Command, _ []string) {
 
 		},
 	}
@@ -80,9 +80,9 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().String(
+	rootCmd.PersistentFlags().StringSlice(
 		"src",
-		".",
+		[]string{},
 		"The source point",
 	)
 	rootCmd.MarkPersistentFlagRequired("src")

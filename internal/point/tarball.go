@@ -1,9 +1,32 @@
+/*
+Copyright © 2023 Théo Bori <nagi@tilde.team>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
 package point
 
 import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -70,7 +93,7 @@ func (t *TarballPoint) Volumes() ([]string, error) {
 	return volumes, nil
 }
 
-func (t *TarballPoint) From(vSrc []string) error {
+func (t *TarballPoint) From(vSrc *[]string) error {
 	u, err := uuid.NewRandom()
 	ctx := context.Background()
 
@@ -89,7 +112,7 @@ func (t *TarballPoint) From(vSrc []string) error {
 	}
 
 	// Create tarballs
-	for _, volume := range vSrc {
+	for _, volume := range *vSrc {
 		err = docker.ExecContainer(
 			ctx,
 			t.cli,
@@ -109,7 +132,7 @@ func (t *TarballPoint) From(vSrc []string) error {
 					Source: tmpVolumeName,
 					Target: "/dest",
 				},
-			},
+			}, "",
 		)
 
 		if err != nil {
@@ -125,7 +148,7 @@ func (t *TarballPoint) From(vSrc []string) error {
 		t.cli,
 		&strslice.StrSlice{
 			"tar",
-			"-cvzf", "/" + filenameBase,
+			"-cvzf", "/dest/" + filenameBase,
 			"-C", "/src", ".",
 		},
 		&[]mount.Mount{
@@ -136,10 +159,11 @@ func (t *TarballPoint) From(vSrc []string) error {
 			},
 			{
 				Type:   mount.TypeBind,
-				Source: t.metadata.value,
-				Target: "/" + filenameBase,
+				Source: common.PopFilename(t.metadata.value),
+				Target: "/dest",
 			},
 		},
+		fmt.Sprintf("%d:%d", os.Getuid(), os.Getegid()),
 	)
 
 	if err != nil {
@@ -154,15 +178,15 @@ func (t *TarballPoint) From(vSrc []string) error {
 	return nil
 }
 
-func (t *TarballPoint) To(vDest []string) error {
+func (t *TarballPoint) To(vDest *[]string) error {
 	ctx := context.Background()
 	vSrc, _ := t.Volumes()
 
 	filenameBase := filepath.Base(t.metadata.value)
 
-	for _, volume := range vDest {
+	for _, volume := range *vDest {
 		if !slices.Contains(vSrc, volume) {
-			fmt.Println("Skip", volume)
+			fmt.Println("Skip [->]", volume)
 			continue
 		}
 
@@ -187,7 +211,7 @@ func (t *TarballPoint) To(vDest []string) error {
 					Source: volume,
 					Target: "/dest",
 				},
-			},
+			}, "",
 		)
 
 		if err != nil {

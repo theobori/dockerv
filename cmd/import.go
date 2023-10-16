@@ -27,19 +27,19 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal"
+	dockerv "github.com/theobori/dockerv/internal/dockerv"
 )
 
 // importCmd represents the import command
 var importCmd = &cobra.Command{
 	Use: "import",
-	Run: func(cmd *cobra.Command, args []string) {
-		dvConfig.PointSource, _ = cmd.Flags().GetString("src")
+	Run: func(cmd *cobra.Command, _ []string) {
+		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
 		dvConfig.Force, _ = cmd.Flags().GetBool("force")
 
 		dest, _ := cmd.Flags().GetString("dest")
 
-		dvConfig.PointDestination = &dest
+		dvConfig.PointDest = &dest
 		dvConfig.Kind = dockerv.Import
 
 		if err := dockerVExecute(); err != nil {

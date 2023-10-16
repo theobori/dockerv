@@ -20,62 +20,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-package cmd
+package dockerv
 
 import (
 	"context"
 	"fmt"
-	"os"
 
-	"github.com/docker/docker/api/types/volume"
-	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal/dockerv"
+	"github.com/theobori/dockerv/common"
 	"github.com/theobori/dockerv/internal/docker"
 )
 
-// copyCmd represents the export command
-var copyCmd = &cobra.Command{
-	Use: "copy",
-	Run: func(cmd *cobra.Command, _ []string) {
-		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
-		dest, _ := cmd.Flags().GetString("dest")
-		force, _ := cmd.Flags().GetBool("force")
-
-		dvConfig.PointDest = &dest
-		dvConfig.Kind = dockerv.Copy
-
-		// Creates the destination if not exists
-		ctx := context.Background()
-
-		if force && !docker.DockerVolumeExists(ctx, cli, dest) {
-			cli.VolumeCreate(
-				ctx,
-				volume.CreateOptions{Name: dest},
-			)
-		}
-
-		if err := dockerVExecute(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-	},
-}
-
-func init() {
-	copyCmd.PersistentFlags().String(
-		"dest",
-		".",
-		"The destination Docker volume",
+func (dv *DockerV) export(vSrc *[]string) error {
+	vSrcExist := docker.DockerGetVolumesExist(
+		context.Background(),
+		dv.cli,
+		*vSrc,
 	)
 
-	copyCmd.PersistentFlags().BoolP(
-		"force",
-		"f",
-		false,
-		"Creates the Docker volume if it does not exist",
-	)
+	if !dv.config.Force && !common.IsSliceinSlice(vSrcExist, *vSrc){
+		return fmt.Errorf("missing volumes, use --force or -f to skip")
+	}
 
-	copyCmd.MarkPersistentFlagRequired("dest")
+	if err := (*dv.destination).From(&vSrcExist); err != nil {
+		return err
+	}
 
-	rootCmd.AddCommand(copyCmd)
+	return nil
 }

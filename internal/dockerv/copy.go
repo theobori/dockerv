@@ -31,7 +31,7 @@ func (dv *DockerV) copy(vSrc *[]string) error {
 
 	pSrc := dv.source[0]
 	ok := true
-	
+
 	ok = ok && (*pSrc).Metadata().Kind(dv.cli) == point.DockerVolume
 	ok = ok && (*dv.destination).Metadata().Kind(dv.cli) == point.DockerVolume
 

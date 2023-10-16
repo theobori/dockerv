@@ -41,11 +41,11 @@ const (
 )
 
 type DockerVConfig struct {
-	Kind             ActionKind
-	PointSource      []string
-	PointDest *string
-	Force            bool
-	State            bool
+	Kind        ActionKind
+	PointSource []string
+	PointDest   *string
+	Force       bool
+	State       bool
 }
 
 type ExecutesValueField struct {
@@ -66,14 +66,14 @@ type DockerV struct {
 
 func NewDockerV(cli *client.Client, config *DockerVConfig) (*DockerV, error) {
 	var pointDest *point.Point
-	
+
 	if config.PointDest != nil {
 		pointDest = point.PointFromValue(
 			cli,
 			*config.PointDest,
 		)
 	}
-	
+
 	pointsSrc := []*point.Point{}
 
 	for _, pointSrc := range config.PointSource {

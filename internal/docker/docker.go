@@ -46,7 +46,7 @@ func DockerVolumeExists(ctx context.Context, cli *client.Client, name string) bo
 
 func DockerGetVolumesExist(ctx context.Context, cli *client.Client, names []string) []string {
 	ret := []string{}
-	
+
 	for _, name := range names {
 		if DockerVolumeExists(ctx, cli, name) {
 			ret = append(ret, name)
@@ -101,7 +101,7 @@ func ExecContainer(
 	if user != "" {
 		config.User = user
 	}
-	
+
 	resp, err := cli.ContainerCreate(
 		ctx,
 		&config,

@@ -33,6 +33,17 @@ import (
 // exportCmd represents the export command
 var exportCmd = &cobra.Command{
 	Use: "export",
+	Short: "Export Docker volumes into a single file.",
+	Long: `Export Docker volumes into a single file.
+	
+Usage examples:
+
+dockerv export \
+    --src docker_volume \
+    --src path/docker-compose.yml \
+    --src path/dir/ \
+    --dest volumes.tar.gz \
+    --force`,
 	Run: func(cmd *cobra.Command, _ []string) {
 		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
 		dvConfig.Force, _ = cmd.Flags().GetBool("force")

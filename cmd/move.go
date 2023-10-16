@@ -36,6 +36,10 @@ import (
 // moveCmd represents the export command
 var moveCmd = &cobra.Command{
 	Use: "move",
+	Short: "Move a Docker volume to another.",
+	Long: `Move a Docker volume to another.
+	
+The source volume is deleted after being copied.`,
 	Run: func(cmd *cobra.Command, _ []string) {
 		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
 		dest, _ := cmd.Flags().GetString("dest")

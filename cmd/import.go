@@ -33,6 +33,22 @@ import (
 // importCmd represents the import command
 var importCmd = &cobra.Command{
 	Use: "import",
+	Short: "Import Docker volumes.",
+	Long: `Import Docker volumes.
+	
+Usage examples:
+
+dockerv import \
+    --src volumes.tar.gz \
+    --dest path/ \
+    --force
+
+dockerv import \
+    --src volume.tar.gz \
+    --dest new_volume_name \
+    --create
+
+dockerv import --src volume.tar.gz`,
 	Run: func(cmd *cobra.Command, _ []string) {
 		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
 		dvConfig.Force, _ = cmd.Flags().GetBool("force")

@@ -40,17 +40,15 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "dockerv",
 		Short: "Manage your Docker volumes",
-		Long: `dockerv is a tool to import, export,
-move and copy your Docker volumes.
+		Long: `dockerv is a tool designed to help you backuping your Docker volumes.
 
-It also supports docker compose
-files and has recursive features.
+Export and import packed Docker volumes across your machines.
 
-A point can be:
-	- A tarball
-	- A Docker volume
-	- A Docker compose file
-	- A directory
+It supports:
+	- Tarball
+	- Docker volume
+	- Docker compose file
+	- Directory (recursive)
 `,
 		Run: func(cmd *cobra.Command, _ []string) {
 

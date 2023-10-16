@@ -32,7 +32,7 @@ import (
 
 // exportCmd represents the export command
 var exportCmd = &cobra.Command{
-	Use: "export",
+	Use:   "export",
 	Short: "Export Docker volumes into a single file.",
 	Long: `Export Docker volumes into a single file.
 	

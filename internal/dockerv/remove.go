@@ -49,7 +49,7 @@ func (dv *DockerV) remove(vSrc *[]string) error {
 		}
 
 		if exists {
-			fmt.Println("[-]", volume)
+			fmt.Println("Removed", volume)
 		}
 	}
 

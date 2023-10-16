@@ -32,7 +32,7 @@ import (
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
-	Use: "list",
+	Use:   "list",
 	Short: "List Docker volumes in specific configuration",
 	Long: `List Docker volumes in specific configuration
 	

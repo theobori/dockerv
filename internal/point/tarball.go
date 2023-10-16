@@ -123,11 +123,13 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 			},
 			&[]mount.Mount{
 				{
+					Consistency: mount.ConsistencyFull,
 					Type:   mount.TypeVolume,
 					Source: volume,
 					Target: "/src",
 				},
 				{
+					Consistency: mount.ConsistencyFull,
 					Type:   mount.TypeVolume,
 					Source: tmpVolumeName,
 					Target: "/dest",
@@ -138,6 +140,8 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 		if err != nil {
 			return err
 		}
+
+		fmt.Println("Exported", volume + ".tar.gz")
 	}
 
 	filenameBase := filepath.Base(t.metadata.value)
@@ -153,11 +157,13 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 		},
 		&[]mount.Mount{
 			{
+				Consistency: mount.ConsistencyFull,
 				Type:   mount.TypeVolume,
 				Source: tmpVolumeName,
 				Target: "/src",
 			},
 			{
+				Consistency: mount.ConsistencyFull,
 				Type:   mount.TypeBind,
 				Source: common.PopFilename(t.metadata.value),
 				Target: "/dest",
@@ -186,7 +192,7 @@ func (t *TarballPoint) To(vDest *[]string) error {
 
 	for _, volume := range *vDest {
 		if !slices.Contains(vSrc, volume) {
-			fmt.Println("Skip [->]", volume)
+			fmt.Println("Skip", volume)
 			continue
 		}
 
@@ -202,11 +208,13 @@ func (t *TarballPoint) To(vDest *[]string) error {
 			},
 			&[]mount.Mount{
 				{
+					Consistency: mount.ConsistencyFull,
 					Type:   mount.TypeBind,
 					Source: t.metadata.value,
 					Target: "/" + filenameBase,
 				},
 				{
+					Consistency: mount.ConsistencyFull,
 					Type:   mount.TypeVolume,
 					Source: volume,
 					Target: "/dest",
@@ -218,7 +226,7 @@ func (t *TarballPoint) To(vDest *[]string) error {
 			return err
 		}
 
-		fmt.Println("[->]", volume)
+		fmt.Println("Imported", volume)
 	}
 
 	return nil

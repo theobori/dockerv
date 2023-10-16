@@ -30,7 +30,7 @@ import (
 
 func (dv *DockerV) _import(vSrc *[]string) error {
 	var vDest []string
-	
+
 	if dv.destination == nil {
 		vDest = *vSrc
 	} else {

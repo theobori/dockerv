@@ -32,7 +32,7 @@ import (
 
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
-	Use: "remove",
+	Use:   "remove",
 	Short: "Remove Docker volumes in specific configuration",
 	Long: `Remove Docker volumes in specific configuration
 	

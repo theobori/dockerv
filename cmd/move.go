@@ -35,7 +35,7 @@ import (
 
 // moveCmd represents the export command
 var moveCmd = &cobra.Command{
-	Use: "move",
+	Use:   "move",
 	Short: "Move a Docker volume to another.",
 	Long: `Move a Docker volume to another.
 	

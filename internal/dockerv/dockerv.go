@@ -132,7 +132,15 @@ func (dv *DockerV) Execute() error {
 	volumesSrc := []string{}
 
 	for _, pSrc := range dv.source {
-		vSrc, _ := (*pSrc).Volumes()
+		if pSrc == nil {
+			continue
+		}
+
+		vSrc, err := (*pSrc).Volumes()
+
+		if err != nil {
+			return err
+		}
 
 		volumesSrc = append(volumesSrc, vSrc...)
 	}

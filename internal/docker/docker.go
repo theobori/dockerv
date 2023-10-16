@@ -56,10 +56,8 @@ func DockerGetVolumesExist(ctx context.Context, cli *client.Client, names []stri
 	return ret
 }
 
-func containerStartAutoRemove(ctx context.Context, cli *client.Client, id string) error {
-	var err error
-
-	if err = cli.ContainerStart(
+func DockerRunSelfRemove(ctx context.Context, cli *client.Client, id string) error {
+	if err := cli.ContainerStart(
 		ctx,
 		id,
 		types.ContainerStartOptions{},
@@ -67,7 +65,22 @@ func containerStartAutoRemove(ctx context.Context, cli *client.Client, id string
 		return err
 	}
 
-	if err = cli.ContainerStop(
+	statusCh, errCh := cli.ContainerWait(
+		context.Background(),
+		id,
+		container.WaitConditionNotRunning,
+	)
+
+	select {
+	case err := <-errCh:
+		if err != nil {
+			return err
+		}
+
+	case <-statusCh:
+	}
+
+	if err := cli.ContainerStop(
 		ctx,
 		id,
 		container.StopOptions{},
@@ -75,7 +88,7 @@ func containerStartAutoRemove(ctx context.Context, cli *client.Client, id string
 		return err
 	}
 
-	if err = cli.ContainerRemove(
+	if err := cli.ContainerRemove(
 		ctx,
 		id,
 		types.ContainerRemoveOptions{},
@@ -106,27 +119,22 @@ func ExecContainer(
 		ctx,
 		&config,
 		&container.HostConfig{
-			Mounts: *mounts,
+			Mounts:     *mounts,
 		}, nil, nil, "",
 	)
-
+	
 	if err != nil {
 		return err
 	}
 
-	if err = containerStartAutoRemove(ctx, cli, resp.ID); err != nil {
+	if err := DockerRunSelfRemove(ctx, cli, resp.ID); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func DockerVolumeCopy(
-	ctx context.Context,
-	cli *client.Client,
-	vSrc string,
-	vDest string,
-) error {
+func DockerVolumeCopy(ctx context.Context, cli *client.Client, vSrc string, vDest string) error {
 	return ExecContainer(
 		ctx,
 		cli,

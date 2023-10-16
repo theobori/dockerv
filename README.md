@@ -32,6 +32,7 @@ Export Docker volumes
 ```bash
 dockerv export \
     --src "relative_or_absolute_path/docker-compose.yml" \
+    --src "relative_or_absolute_path2/" \
     --dest "volumes.tar.gz
 ```
 
@@ -40,6 +41,7 @@ Import Docker volumes
 ```bash
 dockerv import \
     --src "volumes.tar.gz" \
+    --src "volumes2.tar.gz" \
     --dest "relative_or_absolute_path/docker-compose.yml"
 ```
 
@@ -74,7 +76,7 @@ dockerv move \
 - [x] tarball export
 - [ ] zip export
 - [x] Dynamic and scalable point identification
-- [ ] Documentation + (commands help)
+- [ ] Command help
 - [ ] Custom volume destination for single source volume packed
 - [ ] `import` without dest
 - [x] Export output permissions

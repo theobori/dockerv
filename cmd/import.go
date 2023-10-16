@@ -55,7 +55,10 @@ dockerv import --src volume.tar.gz`,
 
 		dest, _ := cmd.Flags().GetString("dest")
 
-		dvConfig.PointDest = &dest
+		if dest != "" {
+			dvConfig.PointDest = &dest
+		}
+
 		dvConfig.Kind = dockerv.Import
 
 		if err := dockerVExecute(); err != nil {
@@ -68,7 +71,7 @@ dockerv import --src volume.tar.gz`,
 func init() {
 	importCmd.PersistentFlags().String(
 		"dest",
-		".",
+		"",
 		"The destination point",
 	)
 
@@ -78,8 +81,6 @@ func init() {
 		false,
 		"Ignore the destination point volumes not fully matching the source point volumes",
 	)
-
-	importCmd.MarkPersistentFlagRequired("dest")
 
 	rootCmd.AddCommand(importCmd)
 }

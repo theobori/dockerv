@@ -91,7 +91,7 @@ func NewDockerV(cli *client.Client, config *DockerVConfig) (*DockerV, error) {
 		make(Executes),
 	}
 
-	dv.executes[Import] = ExecutesValueField{true, dv._import}
+	dv.executes[Import] = ExecutesValueField{false, dv._import}
 	dv.executes[Export] = ExecutesValueField{true, dv.export}
 	dv.executes[Move] = ExecutesValueField{true, dv.move}
 	dv.executes[List] = ExecutesValueField{false, dv.list}

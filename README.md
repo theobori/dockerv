@@ -31,7 +31,6 @@ If you want to help the project, you can follow the guidelines in [CONTRIBUTING.
 - [ ] zip export
 - [x] Dynamic and scalable point identification
 - [x] Command help
-- [ ] Custom volume destination for single source volume packed
-- [ ] `import` without dest
+- [x] `import` without dest
 - [x] Export output permissions
 - [x] Support multi `--src`

@@ -29,7 +29,13 @@ import (
 )
 
 func (dv *DockerV) _import(vSrc *[]string) error {
-	vDest, _ := (*dv.destination).Volumes()
+	var vDest []string
+	
+	if dv.destination == nil {
+		vDest = *vSrc
+	} else {
+		vDest, _ = (*dv.destination).Volumes()
+	}
 
 	if !dv.config.Force && !common.IsSliceinSlice(vDest, *vSrc) {
 		return fmt.Errorf("missing destination point volumes")

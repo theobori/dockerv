@@ -33,8 +33,8 @@ import (
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List Docker volumes in specific configuration",
-	Long: `List Docker volumes in specific configuration
+	Short: "List Docker volumes in specific configuration.",
+	Long: `List Docker volumes in specific configuration.
 	
 This feature exists mostly for directories with docker compose file(s).`,
 	Run: func(cmd *cobra.Command, _ []string) {

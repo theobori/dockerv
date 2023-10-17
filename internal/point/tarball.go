@@ -124,15 +124,15 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 			&[]mount.Mount{
 				{
 					Consistency: mount.ConsistencyFull,
-					Type:   mount.TypeVolume,
-					Source: volume,
-					Target: "/src",
+					Type:        mount.TypeVolume,
+					Source:      volume,
+					Target:      "/src",
 				},
 				{
 					Consistency: mount.ConsistencyFull,
-					Type:   mount.TypeVolume,
-					Source: tmpVolumeName,
-					Target: "/dest",
+					Type:        mount.TypeVolume,
+					Source:      tmpVolumeName,
+					Target:      "/dest",
 				},
 			}, "",
 		)
@@ -141,7 +141,7 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 			return err
 		}
 
-		fmt.Println("Exported", volume + ".tar.gz")
+		fmt.Println("Exported", volume+".tar.gz")
 	}
 
 	filenameBase := filepath.Base(t.metadata.value)
@@ -158,15 +158,15 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 		&[]mount.Mount{
 			{
 				Consistency: mount.ConsistencyFull,
-				Type:   mount.TypeVolume,
-				Source: tmpVolumeName,
-				Target: "/src",
+				Type:        mount.TypeVolume,
+				Source:      tmpVolumeName,
+				Target:      "/src",
 			},
 			{
 				Consistency: mount.ConsistencyFull,
-				Type:   mount.TypeBind,
-				Source: common.PopFilename(t.metadata.value),
-				Target: "/dest",
+				Type:        mount.TypeBind,
+				Source:      common.PopFilename(t.metadata.value),
+				Target:      "/dest",
 			},
 		},
 		fmt.Sprintf("%d:%d", os.Getuid(), os.Getegid()),
@@ -209,15 +209,15 @@ func (t *TarballPoint) To(vDest *[]string) error {
 			&[]mount.Mount{
 				{
 					Consistency: mount.ConsistencyFull,
-					Type:   mount.TypeBind,
-					Source: t.metadata.value,
-					Target: "/" + filenameBase,
+					Type:        mount.TypeBind,
+					Source:      t.metadata.value,
+					Target:      "/" + filenameBase,
 				},
 				{
 					Consistency: mount.ConsistencyFull,
-					Type:   mount.TypeVolume,
-					Source: volume,
-					Target: "/dest",
+					Type:        mount.TypeVolume,
+					Source:      volume,
+					Target:      "/dest",
 				},
 			}, "",
 		)

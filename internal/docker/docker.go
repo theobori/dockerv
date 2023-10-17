@@ -119,10 +119,10 @@ func ExecContainer(
 		ctx,
 		&config,
 		&container.HostConfig{
-			Mounts:     *mounts,
+			Mounts: *mounts,
 		}, nil, nil, "",
 	)
-	
+
 	if err != nil {
 		return err
 	}

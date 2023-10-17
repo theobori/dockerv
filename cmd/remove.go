@@ -33,8 +33,8 @@ import (
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "Remove Docker volumes in specific configuration",
-	Long: `Remove Docker volumes in specific configuration
+	Short: "Remove Docker volumes in specific configuration.",
+	Long: `Remove Docker volumes in specific configuration.
 	
 This feature exists mostly for directories with docker compose file(s).`,
 	Run: func(cmd *cobra.Command, _ []string) {

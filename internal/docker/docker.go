@@ -24,6 +24,7 @@ package docker
 
 import (
 	"context"
+	"io/ioutil"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -154,4 +155,40 @@ func DockerVolumeCopy(ctx context.Context, cli *client.Client, vSrc string, vDes
 			},
 		}, "",
 	)
+}
+
+func DockerImageExists(ctx context.Context, cli *client.Client, id string) bool {
+	if _, _, err := cli.ImageInspectWithRaw(ctx, id); err != nil {
+		return false
+	}
+	
+	return true
+}
+
+func DockerTryPull(ctx context.Context, cli *client.Client, id string) (bool, error) {
+	if DockerImageExists(ctx, cli, id) {
+		return false, nil
+	}
+
+	out, err := cli.ImagePull(
+		ctx,
+		"docker.io/library/" + DockerImage,
+		types.ImagePullOptions{},
+	)
+
+	if err != nil {
+		return false, err
+	}
+
+	defer out.Close()
+	
+	if _, err := ioutil.ReadAll(out); err != nil {
+		return false, err
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

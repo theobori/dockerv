@@ -15,10 +15,10 @@ A simple to use (KISS) CLI to backup Docker volumes.
 ```bash
 go install github.com/theobori/dockerv@latest
 ```
-3. Then you can start using it
+3. Before starting to use it, make sure you have the need resources by doing:
 
 ```bash
-dockerv -h
+dockerv init
 ```
 
 ## 🤝 Contribute

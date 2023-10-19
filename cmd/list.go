@@ -51,6 +51,13 @@ This feature exists mostly for directories with docker compose file(s).`,
 }
 
 func init() {
+	listCmd.PersistentFlags().StringSlice(
+		"src",
+		[]string{},
+		"The source point",
+	)
+	listCmd.MarkPersistentFlagRequired("src")
+
 	listCmd.PersistentFlags().Bool(
 		"state",
 		false,

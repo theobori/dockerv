@@ -78,13 +78,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringSlice(
-		"src",
-		[]string{},
-		"The source point",
-	)
-	rootCmd.MarkPersistentFlagRequired("src")
-
 	// DockerV setup
 	point.Init()
 

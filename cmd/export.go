@@ -61,6 +61,13 @@ dockerv export \
 }
 
 func init() {
+	exportCmd.PersistentFlags().StringSlice(
+		"src",
+		[]string{},
+		"The source point",
+	)
+	exportCmd.MarkPersistentFlagRequired("src")
+
 	exportCmd.PersistentFlags().String(
 		"dest",
 		".",

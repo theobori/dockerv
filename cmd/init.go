@@ -19,7 +19,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-
 package cmd
 
 import (
@@ -27,67 +26,38 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	dockerv "github.com/theobori/dockerv/internal/dockerv"
+	"github.com/theobori/dockerv/internal/docker"
 )
 
-// importCmd represents the import command
-var importCmd = &cobra.Command{
-	Use:   "import",
-	Short: "Import Docker volumes.",
-	Long: `Import Docker volumes.
-	
-Usage examples:
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Init the needed resources needed for dockerv.",
+	Long: `Init the needed resources needed for dockerv.
 
-dockerv import \
-    --src volumes.tar.gz \
-    --dest path/ \
-    --force
+It can be Docker images or anything related.	`,
+	Run: func(cmd *cobra.Command, args []string) {
+		img := docker.DockerImage
 
-dockerv import \
-    --src volume.tar.gz \
-    --dest new_volume_name \
-    --create
+		pulled, err := docker.DockerTryPull(
+			cmd.Context(),
+			cli,
+			img,
+		)
 
-dockerv import --src volume.tar.gz`,
-	Run: func(cmd *cobra.Command, _ []string) {
-		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
-		dvConfig.Force, _ = cmd.Flags().GetBool("force")
-
-		dest, _ := cmd.Flags().GetString("dest")
-
-		if dest != "" {
-			dvConfig.PointDest = &dest
-		}
-
-		dvConfig.Kind = dockerv.Import
-
-		if err := dockerVExecute(); err != nil {
+		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
+		}
+
+		if pulled {
+			fmt.Println("Pulled", img)
+		} else {
+			fmt.Println("You already have", img)
 		}
 	},
 }
 
 func init() {
-	importCmd.PersistentFlags().StringSlice(
-		"src",
-		[]string{},
-		"The source point",
-	)
-	importCmd.MarkPersistentFlagRequired("src")
-
-	importCmd.PersistentFlags().String(
-		"dest",
-		"",
-		"The destination point",
-	)
-
-	importCmd.PersistentFlags().BoolP(
-		"force",
-		"f",
-		false,
-		"Ignore the destination point volumes not fully matching the source point volumes",
-	)
-
-	rootCmd.AddCommand(importCmd)
+	rootCmd.AddCommand(initCmd)
 }

@@ -64,6 +64,13 @@ var copyCmd = &cobra.Command{
 }
 
 func init() {
+	copyCmd.PersistentFlags().StringSlice(
+		"src",
+		[]string{},
+		"The source point",
+	)
+	copyCmd.MarkPersistentFlagRequired("src")
+
 	copyCmd.PersistentFlags().String(
 		"dest",
 		".",

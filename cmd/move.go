@@ -66,6 +66,13 @@ The source volume is deleted after being copied.`,
 }
 
 func init() {
+	moveCmd.PersistentFlags().StringSlice(
+		"src",
+		[]string{},
+		"The source point",
+	)
+	moveCmd.MarkPersistentFlagRequired("src")
+
 	moveCmd.PersistentFlags().String(
 		"dest",
 		".",

@@ -24,7 +24,7 @@ package docker
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -105,15 +105,10 @@ func ExecContainer(
 	cli *client.Client,
 	command *strslice.StrSlice,
 	mounts *[]mount.Mount,
-	user string,
 ) error {
 	config := container.Config{
 		Cmd:   *command,
 		Image: DockerImage,
-	}
-
-	if user != "" {
-		config.User = user
 	}
 
 	resp, err := cli.ContainerCreate(
@@ -153,7 +148,7 @@ func DockerVolumeCopy(ctx context.Context, cli *client.Client, vSrc string, vDes
 				Source: vDest,
 				Target: "/dest",
 			},
-		}, "",
+		},
 	)
 }
 
@@ -182,7 +177,7 @@ func DockerTryPull(ctx context.Context, cli *client.Client, id string) (bool, er
 
 	defer out.Close()
 	
-	if _, err := ioutil.ReadAll(out); err != nil {
+	if _, err := io.ReadAll(out); err != nil {
 		return false, err
 	}
 

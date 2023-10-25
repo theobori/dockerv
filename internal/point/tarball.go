@@ -26,7 +26,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -134,7 +133,7 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 					Source:      tmpVolumeName,
 					Target:      "/dest",
 				},
-			}, "",
+			},
 		)
 
 		if err != nil {
@@ -169,7 +168,6 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 				Target:      "/dest",
 			},
 		},
-		fmt.Sprintf("%d:%d", os.Getuid(), os.Getegid()),
 	)
 
 	if err != nil {
@@ -219,7 +217,7 @@ func (t *TarballPoint) To(vDest *[]string) error {
 					Source:      volume,
 					Target:      "/dest",
 				},
-			}, "",
+			},
 		)
 
 		if err != nil {

@@ -140,7 +140,7 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 			return err
 		}
 
-		fmt.Println("Exported", volume+".tar.gz")
+		fmt.Println("Packed into", t.metadata.value)
 	}
 
 	filenameBase := filepath.Base(t.metadata.value)
@@ -173,6 +173,8 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Exported", )
 
 	// Remove the Docker volume
 	if err = t.cli.VolumeRemove(ctx, tmpVolumeName, true); err != nil {

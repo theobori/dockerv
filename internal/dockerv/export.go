@@ -37,6 +37,10 @@ func (dv *DockerV) export(vSrc *[]string) error {
 		*vSrc,
 	)
 
+	if len(vSrcExist) == 0 {
+		return fmt.Errorf("missing volumes source")
+	}
+
 	if !dv.config.Force && !common.IsSliceinSlice(vSrcExist, *vSrc) {
 		return fmt.Errorf("missing volumes, use --force or -f to skip")
 	}

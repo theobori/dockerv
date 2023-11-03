@@ -30,7 +30,6 @@ import (
 )
 
 func (dv *DockerV) remove(vSrc *[]string) error {
-
 	for _, volume := range *vSrc {
 		exists := docker.DockerVolumeExists(
 			context.Background(),

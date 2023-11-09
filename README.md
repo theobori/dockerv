@@ -27,6 +27,8 @@ If you want to help the project, you can follow the guidelines in [CONTRIBUTING.
 
 ## 🎉 Tasks
 
+- [ ] Docker compose env var `COMPOSE_PROJECT_NAME`
+- [ ] Target local driver only in docker compose files
 - [x] tarball export
 - [ ] zip export
 - [x] Dynamic and scalable point identification

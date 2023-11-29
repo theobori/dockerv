@@ -54,7 +54,7 @@ func (d *DirectoryPoint) Volumes() ([]string, error) {
 				return err
 			}
 
-			p := PointFromValue(d.cli, path)
+			p := PointFromValue(d.cli, path, "")
 
 			if p == nil {
 				return nil

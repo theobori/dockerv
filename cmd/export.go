@@ -46,6 +46,7 @@ dockerv export \
     --force`,
 	Run: func(cmd *cobra.Command, _ []string) {
 		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")
+		dvConfig.User, _ = cmd.Flags().GetString("user")
 		dvConfig.Force, _ = cmd.Flags().GetBool("force")
 
 		dest, _ := cmd.Flags().GetString("dest")
@@ -79,6 +80,12 @@ func init() {
 		"f",
 		false,
 		"Ignore the Docker volumes that does not exist",
+	)
+
+	exportCmd.PersistentFlags().String(
+		"user",
+		"",
+		"User that will be attached to the created container",
 	)
 
 	exportCmd.MarkPersistentFlagRequired("dest")

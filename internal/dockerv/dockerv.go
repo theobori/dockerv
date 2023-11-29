@@ -46,6 +46,7 @@ type DockerVConfig struct {
 	PointDest   *string
 	Force       bool
 	State       bool
+	User string `default:"root:root"`
 }
 
 type ExecutesValueField struct {
@@ -71,6 +72,7 @@ func NewDockerV(cli *client.Client, config *DockerVConfig) (*DockerV, error) {
 		pointDest = point.PointFromValue(
 			cli,
 			*config.PointDest,
+			config.User,
 		)
 	}
 
@@ -79,7 +81,7 @@ func NewDockerV(cli *client.Client, config *DockerVConfig) (*DockerV, error) {
 	for _, pointSrc := range config.PointSource {
 		pointsSrc = append(
 			pointsSrc,
-			point.PointFromValue(cli, pointSrc),
+			point.PointFromValue(cli, pointSrc, config.User),
 		)
 	}
 

@@ -133,7 +133,7 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 					Source:      tmpVolumeName,
 					Target:      "/dest",
 				},
-			},
+			}, "root:root",
 		)
 
 		if err != nil {
@@ -167,7 +167,7 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 				Source:      common.PopFilename(t.metadata.value),
 				Target:      "/dest",
 			},
-		},
+		}, t.metadata.user,
 	)
 
 	if err != nil {
@@ -219,7 +219,7 @@ func (t *TarballPoint) To(vDest *[]string) error {
 					Source:      volume,
 					Target:      "/dest",
 				},
-			},
+			}, "root:root",
 		)
 
 		if err != nil {

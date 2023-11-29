@@ -43,11 +43,6 @@ dockerv import \
     --dest path/ \
     --force
 
-dockerv import \
-    --src volume.tar.gz \
-    --dest new_volume_name \
-    --create
-
 dockerv import --src volume.tar.gz`,
 	Run: func(cmd *cobra.Command, _ []string) {
 		dvConfig.PointSource, _ = cmd.Flags().GetStringSlice("src")

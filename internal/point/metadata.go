@@ -58,17 +58,23 @@ func InitPointKindFuncs() {
 type PointMetadata struct {
 	value string
 	kind  *PointKind
+	user string
 }
 
-func NewPointMetadata(value string) PointMetadata {
+func NewPointMetadata(value string, user string) PointMetadata {
 	return PointMetadata{
 		value,
 		nil,
+		user,
 	}
 }
 
 func (p *PointMetadata) Value() string {
 	return p.value
+}
+
+func (p *PointMetadata) User() string {
+	return p.user
 }
 
 func (p *PointMetadata) AbsValue() string {

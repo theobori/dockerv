@@ -74,8 +74,8 @@ func PointFromMetadata(cli *client.Client, metadata *PointMetadata) *Point {
 	return nil
 }
 
-func PointFromValue(cli *client.Client, value string) *Point {
-	metadata := NewPointMetadata(value)
+func PointFromValue(cli *client.Client, value string, user string) *Point {
+	metadata := NewPointMetadata(value, user)
 
 	return PointFromMetadata(cli, &metadata)
 }

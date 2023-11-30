@@ -140,7 +140,7 @@ func (t *TarballPoint) From(vSrc *[]string) error {
 			return err
 		}
 
-		fmt.Println("Created", volume + ".tar.gz")
+		fmt.Println("Created", volume+".tar.gz")
 	}
 
 	filenameBase := filepath.Base(t.metadata.value)

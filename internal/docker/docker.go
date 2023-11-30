@@ -161,7 +161,7 @@ func DockerImageExists(ctx context.Context, cli *client.Client, id string) bool 
 	if _, _, err := cli.ImageInspectWithRaw(ctx, id); err != nil {
 		return false
 	}
-	
+
 	return true
 }
 
@@ -172,7 +172,7 @@ func DockerTryPull(ctx context.Context, cli *client.Client, id string) (bool, er
 
 	out, err := cli.ImagePull(
 		ctx,
-		"docker.io/library/" + DockerImage,
+		"docker.io/library/"+DockerImage,
 		types.ImagePullOptions{},
 	)
 
@@ -181,7 +181,7 @@ func DockerTryPull(ctx context.Context, cli *client.Client, id string) (bool, er
 	}
 
 	defer out.Close()
-	
+
 	if _, err := io.ReadAll(out); err != nil {
 		return false, err
 	}

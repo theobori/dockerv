@@ -46,7 +46,7 @@ type DockerVConfig struct {
 	PointDest   *string
 	Force       bool
 	State       bool
-	User string `default:"root:root"`
+	User        string `default:"root:root"`
 }
 
 type ExecutesValueField struct {

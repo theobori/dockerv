@@ -58,7 +58,7 @@ func InitPointKindFuncs() {
 type PointMetadata struct {
 	value string
 	kind  *PointKind
-	user string
+	user  string
 }
 
 func NewPointMetadata(value string, user string) PointMetadata {

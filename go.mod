@@ -3,7 +3,7 @@ module github.com/theobori/dockerv
 go 1.19
 
 require (
-	github.com/docker/docker v24.0.6+incompatible
+	github.com/docker/docker v24.0.7+incompatible
 	github.com/google/uuid v1.3.1
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
 )

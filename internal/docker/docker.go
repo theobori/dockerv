@@ -37,7 +37,7 @@ import (
 const DockerComposeFilename = "docker-compose"
 
 // Image used to operate with volumes
-const DockerImage = "busybox"
+const DockerImage = "busybox:1.36"
 
 func DockerVolumeExists(ctx context.Context, cli *client.Client, name string) bool {
 	_, err := cli.VolumeInspect(ctx, name)
